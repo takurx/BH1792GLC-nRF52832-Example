@@ -187,14 +187,103 @@ void twi_init (void)
     APP_ERROR_CHECK(err_code);
 
     // BH1792
-    m_bh1792.fnWrite      = i2c_write;
-    m_bh1792.fnRead       = i2c_read;
+    //m_bh1792.fnWrite      = i2c_write;
+    //m_bh1792.fnRead       = i2c_read;
     ret = bh1792_Init(&m_bh1792);
     //error_check(ret, "bh1792_Init");
+
+    m_bh1792.prm.sel_adc  = BH1792_PRM_SEL_ADC_GREEN;
+    m_bh1792.prm.msr      = BH1792_PRM_MSR_SINGLE;//BH1792_PRM_MSR_1024HZ;
+    m_bh1792.prm.led_en   = (BH1792_PRM_LED_EN1_0 << 1) | BH1792_PRM_LED_EN2_0;
+    m_bh1792.prm.led_cur1 = BH1792_PRM_LED_CUR1_MA(1);
+    m_bh1792.prm.led_cur2 = BH1792_PRM_LED_CUR2_MA(0);
+    m_bh1792.prm.ir_th    = 0xFFFC;
+    m_bh1792.prm.int_sel  = BH1792_PRM_INT_SEL_SGL;//BH1792_PRM_INT_SEL_WTM;
+    ret = bh1792_SetParams();
+    //error_check(ret, "bh1792_SetParams");
+
+    //Serial.println(F("GDATA(@LED_ON),GDATA(@LED_OFF)"));
+
+    ret = bh1792_StartMeasure();
+    //error_check(ret, "bh1792_StartMeasure");
+
+    //attachInterrupt(0, bh1792_isr, LOW);
+
+    //FlexiTimer2::stop();
+    if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
+      //FlexiTimer2::set(2000, 5.0/10000, timer_isr);    // 1Hz timer
+    } else {
+      //FlexiTimer2::set(250, 1.0/8000, timer_isr);      // 32Hz timer
+    }
+    //FlexiTimer2::start();
 
     nrf_drv_twi_enable(&m_twi);
 }
 
+void timer_isr(void) {
+    int32_t ret = 0;
+    uint8_t tmp_eimsk;
+
+    //tmp_eimsk = EIMSK; //EIMSK Enable Interrupt MaSK register, set:1 enable, set:0 disable
+    //EIMSK = 0; //EIMSK Enable Interrupt MaSK register, set:1 enable, set:0 disable
+    //interrupts(); // enable interrupt
+
+    if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
+      ret = bh1792_SetSync();
+      //error_check(ret, "bh1792_SetSync");
+
+      if (m_bh1792.sync_seq < 3) {
+        if (m_bh1792.sync_seq == 1) {
+          tmp_eimsk = 0;
+        } else {
+          ret = bh1792_ClearFifoData();
+          //error_check(ret, "bh1792_ClearFifoData");
+
+          //tmp_eimsk = bit(INT0);
+        }
+      }
+    } else {
+      ret = bh1792_StartMeasure();
+      //error_check(ret, "bh1792_StartMeasure");
+    }
+
+    //noInterrupts(); // disable interrupt
+    //EIMSK |= tmp_eimsk; // undo Enable Interrupt MaSK register
+}
+
+void bh1792_isr(void) {
+    int32_t ret = 0;
+    uint8_t i   = 0;
+
+    //EIMSK = 0; //EIMSK Enable Interrupt MaSK register, set:1 enable, set:0 disable
+    //interrupts(); // enable interrupt
+
+    ret = bh1792_GetMeasData(&m_bh1792_dat);
+    //error_check(ret, "bh1792_GetMeasData");
+
+    if(m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
+      for (i = 0; i < m_bh1792_dat.fifo_lev; i++) {
+        //Serial.print(m_bh1792_dat.fifo[i].on, DEC);
+        //Serial.print(F(","));
+        //Serial.println(m_bh1792_dat.fifo[i].off, DEC);
+      }
+    } else {
+      if(m_bh1792.prm.sel_adc == BH1792_PRM_SEL_ADC_GREEN) {
+        //Serial.print(m_bh1792_dat.green.on, DEC);
+        //Serial.print(F(","));
+        //Serial.println(m_bh1792_dat.green.off, DEC);
+      } else {
+        //Serial.print(m_bh1792_dat.ir.on, DEC);
+        //Serial.print(F(","));
+        //Serial.println(m_bh1792_dat.ir.off, DEC);
+      }
+    }
+
+    //noInterrupts(); // disable interrupt
+    //EIMSK = bit(INT0); // set INT0 Enable Interrupt MaSK register
+}
+
+/*
 // Note:  I2C access should be completed within 0.5ms
 int32_t i2c_write(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size)
 {
@@ -243,6 +332,25 @@ int32_t i2c_read(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_siz
 
   return rc;
 }
+*/
+
+/*
+void error_check(int32_t ret, String msg)
+{
+  if(ret < 0) {
+    msg = "Error: " + msg;
+    msg += " function";
+    //Serial.println(msg);
+    //Serial.print("ret = ");
+    //Serial.println(ret, DEC);
+    if(ret == BH1792_I2C_ERR) {
+      //Serial.print("i2c_ret = ");
+      //Serial.println(m_bh1792.i2c_err, DEC);
+    }
+    while(1);
+  }
+}
+*/
 
 /**
  * @brief Function for reading data from temperature sensor.

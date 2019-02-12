@@ -64,6 +64,7 @@
 
 /* Common addresses definition for temperature sensor. */
 #define LM75B_ADDR          (0x90U >> 1)
+// #define BH1792GLC_ADDR      0x5BU -> bh1792.h BH1792_SLAVE_ADDR
 
 #define LM75B_REG_TEMP      0x00U
 #define LM75B_REG_CONF      0x01U

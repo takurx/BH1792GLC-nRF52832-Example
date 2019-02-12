@@ -74,3 +74,7 @@ examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Rel
 examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Release/Obj/thumb_crt0.o
 examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Release/Obj/twi_sensor_pca10040.ind
 examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Release/Obj/twi_sensor_pca10040.ld
+examples/peripheral/twi_sensor/main.c.bak
+examples/peripheral/twi_sensor/pca10040/blank/config/sdk_config.h.bak
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Release/Obj/nrfx_gpiote.d
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Release/Obj/nrfx_gpiote.o

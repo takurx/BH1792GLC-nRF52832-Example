@@ -66,6 +66,7 @@
       <file file_name="../../../../../../modules/nrfx/drivers/src/nrfx_twim.c" />
       <file file_name="../../../../../../modules/nrfx/drivers/src/nrfx_uart.c" />
       <file file_name="../../../../../../modules/nrfx/drivers/src/nrfx_uarte.c" />
+      <file file_name="../../../../../../modules/nrfx/drivers/src/nrfx_gpiote.c" />
     </folder>
     <folder Name="Application">
       <file file_name="../../../main.c" />

@@ -48,6 +48,9 @@
  */
 
 #include <stdio.h>
+#include <stdbool.h>
+#include "nrf.h"
+#include "nrf_drv_gpiote.h"
 #include "boards.h"
 #include "app_util_platform.h"
 #include "app_error.h"
@@ -73,6 +76,20 @@
 
 /* Mode for LM75B. */
 #define NORMAL_MODE 0U
+
+#ifdef BSP_BUTTON_0
+    #define PIN_IN BSP_BUTTON_0
+#endif
+#ifndef PIN_IN
+    #error "Please indicate input pin"
+#endif
+
+#ifdef BSP_LED_0
+    #define PIN_OUT BSP_LED_0
+#endif
+#ifndef PIN_OUT
+    #error "Please indicate output pin"
+#endif
 
 /* Indicates if operation on TWI has ended. */
 static volatile bool m_xfer_done = false;
@@ -166,6 +183,35 @@ static void read_sensor_data()
     APP_ERROR_CHECK(err_code);
 }
 
+void in_pin_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+{
+    nrf_drv_gpiote_out_toggle(PIN_OUT);
+}
+/**
+ * @brief Function for configuring: PIN_IN pin for input, PIN_OUT pin for output,
+ * and configures GPIOTE to give an interrupt on pin change.
+ */
+static void gpio_init(void)
+{
+    ret_code_t err_code;
+
+    err_code = nrf_drv_gpiote_init();
+    APP_ERROR_CHECK(err_code);
+
+    nrf_drv_gpiote_out_config_t out_config = GPIOTE_CONFIG_OUT_SIMPLE(false);
+
+    err_code = nrf_drv_gpiote_out_init(PIN_OUT, &out_config);
+    APP_ERROR_CHECK(err_code);
+
+    nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
+    in_config.pull = NRF_GPIO_PIN_PULLUP;
+
+    err_code = nrf_drv_gpiote_in_init(PIN_IN, &in_config, in_pin_handler);
+    APP_ERROR_CHECK(err_code);
+
+    nrf_drv_gpiote_in_event_enable(PIN_IN, true);
+}
+
 /**
  * @brief Function for main application entry.
  */
@@ -174,6 +220,8 @@ int main(void)
     APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
     NRF_LOG_DEFAULT_BACKENDS_INIT();
 
+    gpio_init();
+    
     NRF_LOG_INFO("\r\nTWI sensor example started.");
     NRF_LOG_FLUSH();
     twi_init();

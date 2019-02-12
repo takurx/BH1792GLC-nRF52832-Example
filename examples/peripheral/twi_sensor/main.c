@@ -153,12 +153,16 @@ void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
 bh1792_t      m_bh1792;
 bh1792_data_t m_bh1792_dat;
 
+int32_t i2c_write(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size);
+int32_t i2c_read(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size);
+
 /**
  * @brief UART initialization.
  */
 void twi_init (void)
 {
     ret_code_t err_code;
+    int32_t ret = 0;
 
     const nrf_drv_twi_config_t twi_lm75b_config = {
        .scl                = ARDUINO_SCL_PIN,
@@ -182,7 +186,62 @@ void twi_init (void)
     err_code = nrf_drv_twi_init(&m_twi, &twi_bh1792glc_config, twi_handler, NULL);
     APP_ERROR_CHECK(err_code);
 
+    // BH1792
+    m_bh1792.fnWrite      = i2c_write;
+    m_bh1792.fnRead       = i2c_read;
+    ret = bh1792_Init(&m_bh1792);
+    //error_check(ret, "bh1792_Init");
+
     nrf_drv_twi_enable(&m_twi);
+}
+
+// Note:  I2C access should be completed within 0.5ms
+int32_t i2c_write(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size)
+{
+  //byte rc;
+  uint8_t rc;
+
+  if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
+    if((slv_adr != BH1792_SLAVE_ADDR) || (reg_adr != BH1792_ADDR_MEAS_SYNC)) {
+      while(FlexiTimer2::count == 1999);
+    }
+  }
+
+  Wire.beginTransmission(slv_adr);
+  Wire.write(reg_adr);
+  Wire.write(reg, reg_size);
+  rc = Wire.endTransmission(true);
+
+  return rc;
+}
+
+// Note:  I2C access should be completed within 0.5ms
+int32_t i2c_read(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size)
+{
+  //byte rc;
+  uint8_t rc;
+  uint8_t cnt;
+
+  if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
+    while(FlexiTimer2::count == 1999);
+  }
+
+  Wire.beginTransmission(slv_adr);
+  Wire.write(reg_adr);
+  rc = Wire.endTransmission(false);
+  if (rc == 0) {
+    Wire.requestFrom((int32_t)slv_adr, (int32_t)reg_size, true);
+    cnt = 0;
+    while(Wire.available()) {
+      reg[cnt] = Wire.read();
+      cnt++;
+    }
+    if(cnt < reg_size) {
+      rc = 4;
+    }
+  }
+
+  return rc;
 }
 
 /**

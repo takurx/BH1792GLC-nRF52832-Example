@@ -56,7 +56,7 @@
 #include "app_error.h"
 #include "nrf_drv_twi.h"
 #include "nrf_delay.h"
-
+#include <bh1792.h>
 
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
@@ -150,6 +150,9 @@ void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
     }
 }
 
+bh1792_t      m_bh1792;
+bh1792_data_t m_bh1792_dat;
+
 /**
  * @brief UART initialization.
  */
@@ -166,6 +169,17 @@ void twi_init (void)
     };
 
     err_code = nrf_drv_twi_init(&m_twi, &twi_lm75b_config, twi_handler, NULL);
+    APP_ERROR_CHECK(err_code);
+
+    const nrf_drv_twi_config_t twi_bh1792glc_config = {
+       .scl                = ARDUINO_SCL_PIN,
+       .sda                = ARDUINO_SDA_PIN,
+       .frequency          = NRF_DRV_TWI_FREQ_400K,
+       .interrupt_priority = APP_IRQ_PRIORITY_HIGH,
+       .clear_bus_init     = false
+    };
+
+    err_code = nrf_drv_twi_init(&m_twi, &twi_bh1792glc_config, twi_handler, NULL);
     APP_ERROR_CHECK(err_code);
 
     nrf_drv_twi_enable(&m_twi);

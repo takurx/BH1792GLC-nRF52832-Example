@@ -202,7 +202,7 @@ void twi_init (void)
     ret = bh1792_SetParams();
     //error_check(ret, "bh1792_SetParams");
 
-    //Serial.println(F("GDATA(@LED_ON),GDATA(@LED_OFF)"));
+    NRF_LOG_INFO("GDATA(@LED_ON),GDATA(@LED_OFF)\n");
 
     ret = bh1792_StartMeasure();
     //error_check(ret, "bh1792_StartMeasure");
@@ -263,19 +263,19 @@ void bh1792_isr(void) {
 
     if(m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
       for (i = 0; i < m_bh1792_dat.fifo_lev; i++) {
-        //Serial.print(m_bh1792_dat.fifo[i].on, DEC);
-        //Serial.print(F(","));
-        //Serial.println(m_bh1792_dat.fifo[i].off, DEC);
+        NRF_LOG_INFO("%d", m_bh1792_dat.fifo[i].on);
+        NRF_LOG_INFO(",");
+        NRF_LOG_INFO("%d\n", m_bh1792_dat.fifo[i].off);
       }
     } else {
       if(m_bh1792.prm.sel_adc == BH1792_PRM_SEL_ADC_GREEN) {
-        //Serial.print(m_bh1792_dat.green.on, DEC);
-        //Serial.print(F(","));
-        //Serial.println(m_bh1792_dat.green.off, DEC);
+        NRF_LOG_INFO("%d", m_bh1792_dat.green.on);
+        NRF_LOG_INFO(",");
+        NRF_LOG_INFO("%d\n", m_bh1792_dat.green.off);
       } else {
-        //Serial.print(m_bh1792_dat.ir.on, DEC);
-        //Serial.print(F(","));
-        //Serial.println(m_bh1792_dat.ir.off, DEC);
+        NRF_LOG_INFO("%d", m_bh1792_dat.ir.on);
+        NRF_LOG_INFO(",");
+        NRF_LOG_INFO("%d\n", m_bh1792_dat.ir.off);
       }
     }
 
@@ -340,12 +340,12 @@ void error_check(int32_t ret, String msg)
   if(ret < 0) {
     msg = "Error: " + msg;
     msg += " function";
-    //Serial.println(msg);
-    //Serial.print("ret = ");
-    //Serial.println(ret, DEC);
+    NRF_LOG_INFO("%s\n", msg);
+    NRF_LOG_INFO("ret = ");
+    NRF_LOG_INFO("%d", ret);
     if(ret == BH1792_I2C_ERR) {
-      //Serial.print("i2c_ret = ");
-      //Serial.println(m_bh1792.i2c_err, DEC);
+      NRF_LOG_INFO("i2c_ret = ");
+      NRF_LOG_INFO("%d\n", m_bh1792.i2c_err);
     }
     while(1);
   }

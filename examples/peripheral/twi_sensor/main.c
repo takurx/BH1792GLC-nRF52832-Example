@@ -163,7 +163,8 @@ void twi_init (void)
 {
     ret_code_t err_code;
     int32_t ret = 0;
-
+  
+    /*
     const nrf_drv_twi_config_t twi_lm75b_config = {
        .scl                = ARDUINO_SCL_PIN,
        .sda                = ARDUINO_SDA_PIN,
@@ -171,9 +172,10 @@ void twi_init (void)
        .interrupt_priority = APP_IRQ_PRIORITY_HIGH,
        .clear_bus_init     = false
     };
-
+    
     err_code = nrf_drv_twi_init(&m_twi, &twi_lm75b_config, twi_handler, NULL);
     APP_ERROR_CHECK(err_code);
+    */
 
     const nrf_drv_twi_config_t twi_bh1792glc_config = {
        .scl                = ARDUINO_SCL_PIN,

@@ -418,7 +418,7 @@ int main(void)
     NRF_LOG_INFO("\r\nTWI sensor example started.");
     NRF_LOG_FLUSH();
     twi_init();
-    LM75B_set_mode();
+    //LM75B_set_mode();
 
     while (true)
     {
@@ -429,7 +429,7 @@ int main(void)
             __WFE();
         }while (m_xfer_done == false);
 
-        read_sensor_data();
+        //read_sensor_data();
         NRF_LOG_FLUSH();
     }
 }

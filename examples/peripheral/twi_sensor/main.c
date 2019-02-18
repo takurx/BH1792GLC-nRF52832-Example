@@ -253,7 +253,9 @@ void timer_isr(void) {
     //EIMSK |= tmp_eimsk; // undo Enable Interrupt MaSK register
 }
 
-void bh1792_isr(void) {
+//void bh1792_isr(void)
+void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+{
     int32_t ret = 0;
     uint8_t i   = 0;
 
@@ -393,6 +395,14 @@ static void gpio_init(void)
     APP_ERROR_CHECK(err_code);
 
     nrf_drv_gpiote_in_event_enable(PIN_IN, true);
+
+    nrf_drv_gpiote_in_config_t in_config_bh1792 = GPIOTE_CONFIG_IN_SENSE_HITOLO(true); // interrupt when falling edge
+    in_config_bh1792.pull = NRF_GPIO_PIN_PULLUP;
+
+    err_code = nrf_drv_gpiote_in_init(ARDUINO_10_PIN, &in_config_bh1792, bh1792_isr);
+    APP_ERROR_CHECK(err_code);
+
+    nrf_drv_gpiote_in_event_enable(ARDUINO_10_PIN, true);
 }
 
 /**

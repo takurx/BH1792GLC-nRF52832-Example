@@ -62,6 +62,8 @@
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 
+#include "app_timer.h"
+
 /* TWI instance ID. */
 #define TWI_INSTANCE_ID     0
 
@@ -90,6 +92,14 @@
 #ifndef PIN_OUT
     #error "Please indicate output pin"
 #endif
+
+APP_TIMER_DEF(m_battery_timer_id);                                                  /**< Battery timer. */
+//BLE_BAS_DEF(m_bas);  
+
+#define BATTERY_LEVEL_MEAS_INTERVAL     APP_TIMER_TICKS(2000)                       /**< Battery level measurement interval (ticks). */
+//#define MIN_BATTERY_LEVEL               81                                          /**< Minimum battery level as returned by the simulated measurement function. */
+//#define MAX_BATTERY_LEVEL               100                                         /**< Maximum battery level as returned by the simulated measurement function. */
+//#define BATTERY_LEVEL_INCREMENT         1  
 
 /* Indicates if operation on TWI has ended. */
 static volatile bool m_xfer_done = false;
@@ -405,6 +415,65 @@ static void gpio_init(void)
     nrf_drv_gpiote_in_event_enable(ARDUINO_10_PIN, true);
 }
 
+/**@brief Function for handling the Battery measurement timer timeout.
+ *
+ * @details This function will be called each time the battery level measurement timer expires.
+ *
+ * @param[in] p_context   Pointer used for passing some arbitrary information (context) from the
+ *                        app_start_timer() call to the timeout handler.
+ */
+static void battery_level_meas_timeout_handler(void * p_context)
+{
+    UNUSED_PARAMETER(p_context);
+        ret_code_t err_code;
+    uint8_t  battery_level;
+
+    NRF_LOG_INFO("\r\nbattery simulator timer measured.");
+    /*
+    battery_level = (uint8_t)sensorsim_measure(&m_battery_sim_state, &m_battery_sim_cfg);
+
+    err_code = ble_bas_battery_level_update(&m_bas, battery_level, BLE_CONN_HANDLE_ALL);
+    if ((err_code != NRF_SUCCESS) &&
+        (err_code != NRF_ERROR_INVALID_STATE) &&
+        (err_code != NRF_ERROR_RESOURCES) &&
+        (err_code != NRF_ERROR_BUSY) &&
+        (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING) &&
+        (err_code != NRF_ERROR_FORBIDDEN)
+       )
+    {
+        APP_ERROR_HANDLER(err_code);
+    }
+    */
+}
+
+/**@brief Function for initializing the timer module.
+ */
+static void timers_init(void)
+{
+    ret_code_t err_code;
+
+    // Initialize timer module.
+    err_code = app_timer_init();
+    APP_ERROR_CHECK(err_code);
+
+    // Create timers.
+    err_code = app_timer_create(&m_battery_timer_id,
+                                APP_TIMER_MODE_REPEATED,
+                                battery_level_meas_timeout_handler);
+    APP_ERROR_CHECK(err_code);
+}
+
+/**@brief Function for starting application timers.
+ */
+static void application_timers_start(void)
+{
+    ret_code_t err_code;
+
+    // Start application timers.
+    err_code = app_timer_start(m_battery_timer_id, BATTERY_LEVEL_MEAS_INTERVAL, NULL);
+    APP_ERROR_CHECK(err_code);
+}
+
 /**
  * @brief Function for main application entry.
  */
@@ -412,17 +481,20 @@ int main(void)
 {
     APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
     NRF_LOG_DEFAULT_BACKENDS_INIT();
-
-    gpio_init();
     
+    timers_init();
+    gpio_init();
+
     NRF_LOG_INFO("\r\nTWI sensor example started.");
     NRF_LOG_FLUSH();
     twi_init();
+    application_timers_start();
     //LM75B_set_mode();
 
     while (true)
     {
-        nrf_delay_ms(500);
+        /*
+        //nrf_delay_ms(500);
 
         do
         {
@@ -431,6 +503,7 @@ int main(void)
 
         //read_sensor_data();
         NRF_LOG_FLUSH();
+        */
     }
 }
 

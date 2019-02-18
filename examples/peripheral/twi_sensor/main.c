@@ -93,10 +93,12 @@
     #error "Please indicate output pin"
 #endif
 
-APP_TIMER_DEF(m_battery_timer_id);                                                  /**< Battery timer. */
+APP_TIMER_DEF(m_bh1792glc_timer_id);
+//APP_TIMER_DEF(m_battery_timer_id);                                                  /**< Battery timer. */
 //BLE_BAS_DEF(m_bas);  
 
-#define BATTERY_LEVEL_MEAS_INTERVAL     APP_TIMER_TICKS(2000)                       /**< Battery level measurement interval (ticks). */
+#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(32)
+//#define BATTERY_LEVEL_MEAS_INTERVAL     APP_TIMER_TICKS(2000)                       /**< Battery level measurement interval (ticks). */
 //#define MIN_BATTERY_LEVEL               81                                          /**< Minimum battery level as returned by the simulated measurement function. */
 //#define MAX_BATTERY_LEVEL               100                                         /**< Maximum battery level as returned by the simulated measurement function. */
 //#define BATTERY_LEVEL_INCREMENT         1  
@@ -422,13 +424,13 @@ static void gpio_init(void)
  * @param[in] p_context   Pointer used for passing some arbitrary information (context) from the
  *                        app_start_timer() call to the timeout handler.
  */
-static void battery_level_meas_timeout_handler(void * p_context)
+static void bh1792glc_meas_timeout_handler(void * p_context)
 {
     UNUSED_PARAMETER(p_context);
-        ret_code_t err_code;
-    uint8_t  battery_level;
+    ret_code_t err_code;
+    //uint8_t  battery_level;
 
-    NRF_LOG_INFO("\r\nbattery simulator timer measured.");
+    NRF_LOG_INFO("\r\nbh1792glc measure timer interrupt.");
     /*
     battery_level = (uint8_t)sensorsim_measure(&m_battery_sim_state, &m_battery_sim_cfg);
 
@@ -457,9 +459,14 @@ static void timers_init(void)
     APP_ERROR_CHECK(err_code);
 
     // Create timers.
+    /*
     err_code = app_timer_create(&m_battery_timer_id,
                                 APP_TIMER_MODE_REPEATED,
                                 battery_level_meas_timeout_handler);
+                                */
+    err_code = app_timer_create(&m_bh1792glc_timer_id,
+                                APP_TIMER_MODE_REPEATED,
+                                bh1792glc_meas_timeout_handler);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -470,7 +477,7 @@ static void application_timers_start(void)
     ret_code_t err_code;
 
     // Start application timers.
-    err_code = app_timer_start(m_battery_timer_id, BATTERY_LEVEL_MEAS_INTERVAL, NULL);
+    err_code = app_timer_start(m_bh1792glc_timer_id, BH1792GLC_MEAS_INTERVAL, NULL);
     APP_ERROR_CHECK(err_code);
 }
 

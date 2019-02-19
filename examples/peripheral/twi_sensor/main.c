@@ -138,14 +138,17 @@ void LM75B_set_mode(void)
  *
  * @param[in] temp          Temperature in Celsius degrees read from sensor.
  */
+/*
 __STATIC_INLINE void data_handler(uint8_t temp)
 {
     NRF_LOG_INFO("Temperature: %d Celsius degrees.", temp);
 }
+*/
 
 /**
  * @brief TWI events handler.
  */
+/*
 void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
 {
     switch (p_event->type)
@@ -161,6 +164,7 @@ void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
             break;
     }
 }
+*/
 
 bh1792_t      m_bh1792;
 bh1792_data_t m_bh1792_dat;
@@ -197,7 +201,8 @@ void twi_init (void)
        .clear_bus_init     = false
     };
 
-    err_code = nrf_drv_twi_init(&m_twi, &twi_bh1792glc_config, twi_handler, NULL);
+    //err_code = nrf_drv_twi_init(&m_twi, &twi_bh1792glc_config, twi_handler, NULL);
+    err_code = nrf_drv_twi_init(&m_twi, &twi_bh1792glc_config, NULL, NULL);
     APP_ERROR_CHECK(err_code);
 
     // BH1792
@@ -224,12 +229,14 @@ void twi_init (void)
     //attachInterrupt(0, bh1792_isr, LOW);
 
     //FlexiTimer2::stop();
+    /*
     if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
       //FlexiTimer2::set(2000, 5.0/10000, timer_isr);    // 1Hz timer
     } else {
       //FlexiTimer2::set(250, 1.0/8000, timer_isr);      // 32Hz timer
     }
     //FlexiTimer2::start();
+    */
 
     nrf_drv_twi_enable(&m_twi);
 }

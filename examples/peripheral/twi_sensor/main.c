@@ -97,7 +97,7 @@ APP_TIMER_DEF(m_bh1792glc_timer_id);
 //APP_TIMER_DEF(m_battery_timer_id);                                                  /**< Battery timer. */
 //BLE_BAS_DEF(m_bas);  
 
-#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(32)
+#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(2000)
 //#define BATTERY_LEVEL_MEAS_INTERVAL     APP_TIMER_TICKS(2000)                       /**< Battery level measurement interval (ticks). */
 //#define MIN_BATTERY_LEVEL               81                                          /**< Minimum battery level as returned by the simulated measurement function. */
 //#define MAX_BATTERY_LEVEL               100                                         /**< Maximum battery level as returned by the simulated measurement function. */
@@ -115,17 +115,18 @@ static uint8_t m_sample;
 /**
  * @brief Function for setting active mode on MMA7660 accelerometer.
  */
+
 void LM75B_set_mode(void)
 {
     ret_code_t err_code;
 
-    /* Writing to LM75B_REG_CONF "0" set temperature sensor in NORMAL mode. */
+    // Writing to LM75B_REG_CONF "0" set temperature sensor in NORMAL mode. 
     uint8_t reg[2] = {LM75B_REG_CONF, NORMAL_MODE};
     err_code = nrf_drv_twi_tx(&m_twi, LM75B_ADDR, reg, sizeof(reg), false);
     APP_ERROR_CHECK(err_code);
     while (m_xfer_done == false);
 
-    /* Writing to pointer byte. */
+    // Writing to pointer byte. 
     reg[0] = LM75B_REG_TEMP;
     m_xfer_done = false;
     err_code = nrf_drv_twi_tx(&m_twi, LM75B_ADDR, reg, 1, false);
@@ -133,33 +134,41 @@ void LM75B_set_mode(void)
     while (m_xfer_done == false);
 }
 
+
 /**
  * @brief Function for handling data from temperature sensor.
  *
  * @param[in] temp          Temperature in Celsius degrees read from sensor.
  */
+
 __STATIC_INLINE void data_handler(uint8_t temp)
 {
     NRF_LOG_INFO("Temperature: %d Celsius degrees.", temp);
 }
 
+
 /**
  * @brief TWI events handler.
  */
+
 void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
 {
+    NRF_LOG_INFO("twi_handler.");
+    
     switch (p_event->type)
     {
         case NRF_DRV_TWI_EVT_DONE:
             if (p_event->xfer_desc.type == NRF_DRV_TWI_XFER_RX)
             {
-                data_handler(m_sample);
+                //data_handler(m_sample);
+                NRF_LOG_INFO("Temperature: %d Celsius degrees.", m_sample);
             }
             m_xfer_done = true;
             break;
         default:
             break;
     }
+    
 }
 
 bh1792_t      m_bh1792;
@@ -176,7 +185,6 @@ void twi_init (void)
     ret_code_t err_code;
     int32_t ret = 0;
   
-    /*
     const nrf_drv_twi_config_t twi_lm75b_config = {
        .scl                = ARDUINO_SCL_PIN,
        .sda                = ARDUINO_SDA_PIN,
@@ -187,8 +195,8 @@ void twi_init (void)
     
     err_code = nrf_drv_twi_init(&m_twi, &twi_lm75b_config, twi_handler, NULL);
     APP_ERROR_CHECK(err_code);
-    */
-
+/*
+    NRF_LOG_INFO("before twi_bh1792glc_config.");
     const nrf_drv_twi_config_t twi_bh1792glc_config = {
        .scl                = ARDUINO_SCL_PIN,
        .sda                = ARDUINO_SDA_PIN,
@@ -197,13 +205,19 @@ void twi_init (void)
        .clear_bus_init     = false
     };
 
+    NRF_LOG_INFO("before nrf_drv_twi_init.");
+    //err_code = nrf_drv_twi_init(&m_twi, &twi_bh1792glc_config, twi_handler, NULL);
     err_code = nrf_drv_twi_init(&m_twi, &twi_bh1792glc_config, twi_handler, NULL);
+    NRF_LOG_INFO("finished nrf_drv_twi_init.");
     APP_ERROR_CHECK(err_code);
 
+    nrf_drv_twi_enable(&m_twi);
+
     // BH1792
-    //m_bh1792.fnWrite      = i2c_write;
-    //m_bh1792.fnRead       = i2c_read;
+    m_bh1792.fnWrite      = i2c_write;
+    m_bh1792.fnRead       = i2c_read;
     ret = bh1792_Init(&m_bh1792);
+    NRF_LOG_INFO("finished bh1792_Init.");
     //error_check(ret, "bh1792_Init");
 
     m_bh1792.prm.sel_adc  = BH1792_PRM_SEL_ADC_GREEN;
@@ -215,28 +229,32 @@ void twi_init (void)
     m_bh1792.prm.int_sel  = BH1792_PRM_INT_SEL_SGL;//BH1792_PRM_INT_SEL_WTM;
     ret = bh1792_SetParams();
     //error_check(ret, "bh1792_SetParams");
+    NRF_LOG_INFO("finished bh1792_SetParams.");
 
-    NRF_LOG_INFO("GDATA(@LED_ON),GDATA(@LED_OFF)\n");
+    //NRF_LOG_INFO("GDATA(@LED_ON),GDATA(@LED_OFF)\n");
 
     ret = bh1792_StartMeasure();
     //error_check(ret, "bh1792_StartMeasure");
-
+    NRF_LOG_INFO("finished bh1792_StartMeasure.");
+*/
     //attachInterrupt(0, bh1792_isr, LOW);
 
     //FlexiTimer2::stop();
+    /*
     if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
       //FlexiTimer2::set(2000, 5.0/10000, timer_isr);    // 1Hz timer
     } else {
       //FlexiTimer2::set(250, 1.0/8000, timer_isr);      // 32Hz timer
     }
     //FlexiTimer2::start();
-
-    nrf_drv_twi_enable(&m_twi);
+    */
 }
 
-void timer_isr(void) {
+//void timer_isr(void)
+static void timer_isr(void * p_context)
+{
     int32_t ret = 0;
-    uint8_t tmp_eimsk;
+    //uint8_t tmp_eimsk;
 
     //tmp_eimsk = EIMSK; //EIMSK Enable Interrupt MaSK register, set:1 enable, set:0 disable
     //EIMSK = 0; //EIMSK Enable Interrupt MaSK register, set:1 enable, set:0 disable
@@ -248,7 +266,7 @@ void timer_isr(void) {
 
       if (m_bh1792.sync_seq < 3) {
         if (m_bh1792.sync_seq == 1) {
-          tmp_eimsk = 0;
+          //tmp_eimsk = 0;
         } else {
           ret = bh1792_ClearFifoData();
           //error_check(ret, "bh1792_ClearFifoData");
@@ -385,14 +403,16 @@ void error_check(int32_t ret, String msg)
 /**
  * @brief Function for reading data from temperature sensor.
  */
+
 static void read_sensor_data()
 {
     m_xfer_done = false;
 
-    /* Read 1 byte from the specified address - skip 3 bits dedicated for fractional part of temperature. */
+    // Read 1 byte from the specified address - skip 3 bits dedicated for fractional part of temperature.
     ret_code_t err_code = nrf_drv_twi_rx(&m_twi, LM75B_ADDR, &m_sample, sizeof(m_sample));
     APP_ERROR_CHECK(err_code);
 }
+
 
 void in_pin_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
@@ -409,11 +429,13 @@ static void gpio_init(void)
     err_code = nrf_drv_gpiote_init();
     APP_ERROR_CHECK(err_code);
 
+    // LED1
     nrf_drv_gpiote_out_config_t out_config = GPIOTE_CONFIG_OUT_SIMPLE(false);
 
     err_code = nrf_drv_gpiote_out_init(PIN_OUT, &out_config);
     APP_ERROR_CHECK(err_code);
 
+    // Button1
     nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
     in_config.pull = NRF_GPIO_PIN_PULLUP;
 
@@ -422,13 +444,14 @@ static void gpio_init(void)
 
     nrf_drv_gpiote_in_event_enable(PIN_IN, true);
 
+    // bh1792glc, arudino_10_pin
     nrf_drv_gpiote_in_config_t in_config_bh1792 = GPIOTE_CONFIG_IN_SENSE_HITOLO(true); // interrupt when falling edge
     in_config_bh1792.pull = NRF_GPIO_PIN_PULLUP;
 
     err_code = nrf_drv_gpiote_in_init(ARDUINO_10_PIN, &in_config_bh1792, bh1792_isr);
     APP_ERROR_CHECK(err_code);
 
-    nrf_drv_gpiote_in_event_enable(ARDUINO_10_PIN, true);
+    //nrf_drv_gpiote_in_event_enable(ARDUINO_10_PIN, true);
 }
 
 /**@brief Function for handling the Battery measurement timer timeout.
@@ -438,6 +461,7 @@ static void gpio_init(void)
  * @param[in] p_context   Pointer used for passing some arbitrary information (context) from the
  *                        app_start_timer() call to the timeout handler.
  */
+/*
 static void bh1792glc_meas_timeout_handler(void * p_context)
 {
     UNUSED_PARAMETER(p_context);
@@ -445,7 +469,7 @@ static void bh1792glc_meas_timeout_handler(void * p_context)
     //uint8_t  battery_level;
 
     NRF_LOG_INFO("\r\nbh1792glc measure timer interrupt.");
-    /*
+    
     battery_level = (uint8_t)sensorsim_measure(&m_battery_sim_state, &m_battery_sim_cfg);
 
     err_code = ble_bas_battery_level_update(&m_bas, battery_level, BLE_CONN_HANDLE_ALL);
@@ -459,8 +483,9 @@ static void bh1792glc_meas_timeout_handler(void * p_context)
     {
         APP_ERROR_HANDLER(err_code);
     }
-    */
+    
 }
+*/
 
 /**@brief Function for initializing the timer module.
  */
@@ -478,9 +503,15 @@ static void timers_init(void)
                                 APP_TIMER_MODE_REPEATED,
                                 battery_level_meas_timeout_handler);
                                 */
+                                /*
     err_code = app_timer_create(&m_bh1792glc_timer_id,
                                 APP_TIMER_MODE_REPEATED,
                                 bh1792glc_meas_timeout_handler);
+                                */
+
+    err_code = app_timer_create(&m_bh1792glc_timer_id,
+                                APP_TIMER_MODE_REPEATED,
+                                timer_isr);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -503,20 +534,23 @@ int main(void)
     APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
     NRF_LOG_DEFAULT_BACKENDS_INIT();
     
-    timers_init();
+    //timers_init();
     gpio_init();
 
-    NRF_LOG_INFO("\r\nTWI sensor example started.");
-    NRF_LOG_FLUSH();
+    NRF_LOG_INFO("TWI sensor example started.");
+    //NRF_LOG_FLUSH();
     twi_init();
-    application_timers_start();
-    //LM75B_set_mode();
+    NRF_LOG_INFO("finished twi init.");
+    //application_timers_start();
+    NRF_LOG_INFO("application_timers start.");
+    LM75B_set_mode();
 
     while (true)
     {
-        /*
-        //nrf_delay_ms(500);
-
+        // Do nothing.
+        
+        nrf_delay_ms(500);
+        
         do
         {
             __WFE();
@@ -524,7 +558,7 @@ int main(void)
 
         //read_sensor_data();
         NRF_LOG_FLUSH();
-        */
+        
     }
 }
 

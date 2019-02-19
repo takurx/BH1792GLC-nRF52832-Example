@@ -78,3 +78,8 @@ examples/peripheral/twi_sensor/main.c.bak
 examples/peripheral/twi_sensor/pca10040/blank/config/sdk_config.h.bak
 examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Release/Obj/nrfx_gpiote.d
 examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Release/Obj/nrfx_gpiote.o
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Release/Obj/app_timer.d
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Release/Obj/app_timer.d
+examples/peripheral/twi_sensor/pca10040/blank/ses/twi_sensor_pca10040_Release.jlink
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Release/Obj/app_timer.o
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Release/Obj/app_timer.d

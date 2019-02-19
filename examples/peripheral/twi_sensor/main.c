@@ -164,7 +164,7 @@ void twi_init (void)
     ret_code_t err_code;
     int32_t ret = 0;
   
-    /*
+    
     const nrf_drv_twi_config_t twi_lm75b_config = {
        .scl                = ARDUINO_SCL_PIN,
        .sda                = ARDUINO_SDA_PIN,
@@ -175,8 +175,8 @@ void twi_init (void)
     
     err_code = nrf_drv_twi_init(&m_twi, &twi_lm75b_config, twi_handler, NULL);
     APP_ERROR_CHECK(err_code);
-    */
-
+    
+/*
     const nrf_drv_twi_config_t twi_bh1792glc_config = {
        .scl                = ARDUINO_SCL_PIN,
        .sda                = ARDUINO_SDA_PIN,
@@ -218,7 +218,7 @@ void twi_init (void)
       //FlexiTimer2::set(250, 1.0/8000, timer_isr);      // 32Hz timer
     }
     //FlexiTimer2::start();
-
+*/
     nrf_drv_twi_enable(&m_twi);
 }
 
@@ -402,7 +402,7 @@ static void gpio_init(void)
     err_code = nrf_drv_gpiote_in_init(ARDUINO_10_PIN, &in_config_bh1792, bh1792_isr);
     APP_ERROR_CHECK(err_code);
 
-    nrf_drv_gpiote_in_event_enable(ARDUINO_10_PIN, true);
+    //nrf_drv_gpiote_in_event_enable(ARDUINO_10_PIN, true);
 }
 
 /**

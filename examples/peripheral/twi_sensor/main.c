@@ -115,23 +115,25 @@ static uint8_t m_sample;
 /**
  * @brief Function for setting active mode on MMA7660 accelerometer.
  */
+/*
 void LM75B_set_mode(void)
 {
     ret_code_t err_code;
 
-    /* Writing to LM75B_REG_CONF "0" set temperature sensor in NORMAL mode. */
+    // Writing to LM75B_REG_CONF "0" set temperature sensor in NORMAL mode. 
     uint8_t reg[2] = {LM75B_REG_CONF, NORMAL_MODE};
     err_code = nrf_drv_twi_tx(&m_twi, LM75B_ADDR, reg, sizeof(reg), false);
     APP_ERROR_CHECK(err_code);
     while (m_xfer_done == false);
 
-    /* Writing to pointer byte. */
+    // Writing to pointer byte. 
     reg[0] = LM75B_REG_TEMP;
     m_xfer_done = false;
     err_code = nrf_drv_twi_tx(&m_twi, LM75B_ADDR, reg, 1, false);
     APP_ERROR_CHECK(err_code);
     while (m_xfer_done == false);
 }
+*/
 
 /**
  * @brief Function for handling data from temperature sensor.
@@ -521,6 +523,7 @@ int main(void)
 
     while (true)
     {
+        // Do nothing.
         /*
         //nrf_delay_ms(500);
 

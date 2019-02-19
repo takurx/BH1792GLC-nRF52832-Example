@@ -454,6 +454,7 @@ static void gpio_init(void)
  * @param[in] p_context   Pointer used for passing some arbitrary information (context) from the
  *                        app_start_timer() call to the timeout handler.
  */
+/*
 static void bh1792glc_meas_timeout_handler(void * p_context)
 {
     UNUSED_PARAMETER(p_context);
@@ -461,7 +462,7 @@ static void bh1792glc_meas_timeout_handler(void * p_context)
     //uint8_t  battery_level;
 
     NRF_LOG_INFO("\r\nbh1792glc measure timer interrupt.");
-    /*
+    
     battery_level = (uint8_t)sensorsim_measure(&m_battery_sim_state, &m_battery_sim_cfg);
 
     err_code = ble_bas_battery_level_update(&m_bas, battery_level, BLE_CONN_HANDLE_ALL);
@@ -475,8 +476,9 @@ static void bh1792glc_meas_timeout_handler(void * p_context)
     {
         APP_ERROR_HANDLER(err_code);
     }
-    */
+    
 }
+*/
 
 /**@brief Function for initializing the timer module.
  */

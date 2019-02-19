@@ -104,13 +104,13 @@ APP_TIMER_DEF(m_bh1792glc_timer_id);
 //#define BATTERY_LEVEL_INCREMENT         1  
 
 /* Indicates if operation on TWI has ended. */
-//static volatile bool m_xfer_done = false;
+static volatile bool m_xfer_done = false;
 
 /* TWI instance. */
 static const nrf_drv_twi_t m_twi = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID);
 
 /* Buffer for samples read from temperature sensor. */
-//static uint8_t m_sample;
+static uint8_t m_sample;
 
 /**
  * @brief Function for setting active mode on MMA7660 accelerometer.
@@ -150,7 +150,7 @@ __STATIC_INLINE void data_handler(uint8_t temp)
 /**
  * @brief TWI events handler.
  */
-/*
+
 void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
 {
     switch (p_event->type)
@@ -158,7 +158,8 @@ void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
         case NRF_DRV_TWI_EVT_DONE:
             if (p_event->xfer_desc.type == NRF_DRV_TWI_XFER_RX)
             {
-                data_handler(m_sample);
+                //data_handler(m_sample);
+                NRF_LOG_INFO("Temperature: %d Celsius degrees.", m_sample);
             }
             m_xfer_done = true;
             break;
@@ -166,7 +167,6 @@ void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
             break;
     }
 }
-*/
 
 bh1792_t      m_bh1792;
 bh1792_data_t m_bh1792_dat;
@@ -195,6 +195,7 @@ void twi_init (void)
     APP_ERROR_CHECK(err_code);
     */
 
+    NRF_LOG_INFO("before twi_bh1792glc_config.");
     const nrf_drv_twi_config_t twi_bh1792glc_config = {
        .scl                = ARDUINO_SCL_PIN,
        .sda                = ARDUINO_SDA_PIN,
@@ -203,14 +204,19 @@ void twi_init (void)
        .clear_bus_init     = false
     };
 
+    NRF_LOG_INFO("before nrf_drv_twi_init.");
     //err_code = nrf_drv_twi_init(&m_twi, &twi_bh1792glc_config, twi_handler, NULL);
-    err_code = nrf_drv_twi_init(&m_twi, &twi_bh1792glc_config, NULL, NULL);
+    err_code = nrf_drv_twi_init(&m_twi, &twi_bh1792glc_config, twi_handler, NULL);
+    NRF_LOG_INFO("finished nrf_drv_twi_init.");
     APP_ERROR_CHECK(err_code);
 
+    nrf_drv_twi_enable(&m_twi);
+
     // BH1792
-    //m_bh1792.fnWrite      = i2c_write;
-    //m_bh1792.fnRead       = i2c_read;
+    m_bh1792.fnWrite      = i2c_write;
+    m_bh1792.fnRead       = i2c_read;
     ret = bh1792_Init(&m_bh1792);
+    NRF_LOG_INFO("finished bh1792_Init.");
     //error_check(ret, "bh1792_Init");
 
     m_bh1792.prm.sel_adc  = BH1792_PRM_SEL_ADC_GREEN;
@@ -222,6 +228,7 @@ void twi_init (void)
     m_bh1792.prm.int_sel  = BH1792_PRM_INT_SEL_SGL;//BH1792_PRM_INT_SEL_WTM;
     ret = bh1792_SetParams();
     //error_check(ret, "bh1792_SetParams");
+    NRF_LOG_INFO("finished bh1792_SetParams.");
 
     NRF_LOG_INFO("GDATA(@LED_ON),GDATA(@LED_OFF)\n");
 
@@ -239,8 +246,6 @@ void twi_init (void)
     }
     //FlexiTimer2::start();
     */
-
-    nrf_drv_twi_enable(&m_twi);
 }
 
 //void timer_isr(void)
@@ -530,10 +535,12 @@ int main(void)
     timers_init();
     gpio_init();
 
-    NRF_LOG_INFO("\r\nTWI sensor example started.");
-    NRF_LOG_FLUSH();
+    NRF_LOG_INFO("TWI sensor example started.");
+    //NRF_LOG_FLUSH();
     twi_init();
+    NRF_LOG_INFO("finished twi init.");
     application_timers_start();
+    NRF_LOG_INFO("advertise start.");
     //LM75B_set_mode();
 
     while (true)

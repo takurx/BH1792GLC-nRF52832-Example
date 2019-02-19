@@ -323,39 +323,46 @@ int32_t i2c_write(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_si
     APP_ERROR_CHECK(err_code);
 
     //return rc;
-    return true;
+    return 0;
 }
 
-/*
 // Note:  I2C access should be completed within 0.5ms
 int32_t i2c_read(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size)
 {
-  //byte rc;
-  uint8_t rc;
-  uint8_t cnt;
+    //byte rc;
+    //uint8_t rc;
+    //uint8_t cnt;
+    ret_code_t err_code;
 
-  if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
-    while(FlexiTimer2::count == 1999);
-  }
-
-  Wire.beginTransmission(slv_adr);
-  Wire.write(reg_adr);
-  rc = Wire.endTransmission(false);
-  if (rc == 0) {
-    Wire.requestFrom((int32_t)slv_adr, (int32_t)reg_size, true);
-    cnt = 0;
-    while(Wire.available()) {
-      reg[cnt] = Wire.read();
-      cnt++;
+    /*
+    if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
+      while(FlexiTimer2::count == 1999);
     }
-    if(cnt < reg_size) {
-      rc = 4;
-    }
-  }
+    */
 
-  return rc;
+    /*
+    Wire.beginTransmission(slv_adr);
+    Wire.write(reg_adr);
+    rc = Wire.endTransmission(false);
+    if (rc == 0) {
+      Wire.requestFrom((int32_t)slv_adr, (int32_t)reg_size, true);
+      cnt = 0;
+      while(Wire.available()) {
+        reg[cnt] = Wire.read();
+        cnt++;
+      }
+      if(cnt < reg_size) {
+        rc = 4;
+      }
+    }
+    */
+    err_code = nrf_drv_twi_rx(&m_twi, slv_adr, reg, reg_size);
+    APP_ERROR_CHECK(err_code);
+
+    //return rc;
+    return 0;
 }
-*/
+
 
 /*
 void error_check(int32_t ret, String msg)

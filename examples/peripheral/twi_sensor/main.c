@@ -237,6 +237,8 @@ void twi_init (void)
 //void timer_isr(void)
 static void timer_isr(void * p_context)
 {
+    NRF_LOG_INFO("timer_isr.");
+    /*
     int32_t ret = 0;
     //uint8_t tmp_eimsk;
 
@@ -262,7 +264,7 @@ static void timer_isr(void * p_context)
       ret = bh1792_StartMeasure();
       //error_check(ret, "bh1792_StartMeasure");
     }
-
+    */
     //noInterrupts(); // disable interrupt
     //EIMSK |= tmp_eimsk; // undo Enable Interrupt MaSK register
 }
@@ -270,6 +272,8 @@ static void timer_isr(void * p_context)
 //void bh1792_isr(void)
 void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
+    NRF_LOG_INFO("bh1792_isr.");
+    /*
     int32_t ret = 0;
     uint8_t i   = 0;
 
@@ -296,7 +300,7 @@ void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
         NRF_LOG_INFO("%d\n", m_bh1792_dat.ir.off);
       }
     }
-
+    */
     //noInterrupts(); // disable interrupt
     //EIMSK = bit(INT0); // set INT0 Enable Interrupt MaSK register
 }
@@ -427,10 +431,10 @@ static void gpio_init(void)
     nrf_drv_gpiote_in_config_t in_config_bh1792 = GPIOTE_CONFIG_IN_SENSE_HITOLO(true); // interrupt when falling edge
     in_config_bh1792.pull = NRF_GPIO_PIN_PULLUP;
 
-    err_code = nrf_drv_gpiote_in_init(ARDUINO_10_PIN, &in_config_bh1792, bh1792_isr);
+    err_code = nrf_drv_gpiote_in_init(ARDUINO_3_PIN, &in_config_bh1792, bh1792_isr);
     APP_ERROR_CHECK(err_code);
 
-    //nrf_drv_gpiote_in_event_enable(ARDUINO_10_PIN, true);
+    nrf_drv_gpiote_in_event_enable(ARDUINO_3_PIN, true);
 }
 
 /**@brief Function for handling the Battery measurement timer timeout.

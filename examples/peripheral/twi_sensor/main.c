@@ -50,6 +50,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "nrf.h"
+#include "nrf_drv_timer.h"
 #include "nrf_drv_gpiote.h"
 #include "boards.h"
 #include "app_util_platform.h"
@@ -63,6 +64,7 @@
 #include "nrf_log_default_backends.h"
 
 #include "app_timer.h"
+#include "nrf_drv_clock.h"
 
 /* TWI instance ID. */
 #define TWI_INSTANCE_ID     0
@@ -94,7 +96,7 @@
 #endif
 
 APP_TIMER_DEF(m_bh1792glc_timer_id);
-#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(31)
+#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(2000)
 /* Indicates if operation on TWI has ended. */
 static volatile bool m_xfer_done = false;
 
@@ -444,15 +446,15 @@ static void gpio_init(void)
  * @param[in] p_context   Pointer used for passing some arbitrary information (context) from the
  *                        app_start_timer() call to the timeout handler.
  */
-/*
+
 static void bh1792glc_meas_timeout_handler(void * p_context)
 {
     UNUSED_PARAMETER(p_context);
     ret_code_t err_code;
     //uint8_t  battery_level;
 
-    NRF_LOG_INFO("\r\nbh1792glc measure timer interrupt.");
-    
+    NRF_LOG_INFO("bh1792glc measure timer interrupt.");
+    /*
     battery_level = (uint8_t)sensorsim_measure(&m_battery_sim_state, &m_battery_sim_cfg);
 
     err_code = ble_bas_battery_level_update(&m_bas, battery_level, BLE_CONN_HANDLE_ALL);
@@ -466,9 +468,10 @@ static void bh1792glc_meas_timeout_handler(void * p_context)
     {
         APP_ERROR_HANDLER(err_code);
     }
+    */
     
 }
-*/
+
 
 /**@brief Function for initializing the timer module.
  */
@@ -486,15 +489,16 @@ static void timers_init(void)
                                 APP_TIMER_MODE_REPEATED,
                                 battery_level_meas_timeout_handler);
                                 */
-                                /*
+                                
     err_code = app_timer_create(&m_bh1792glc_timer_id,
                                 APP_TIMER_MODE_REPEATED,
                                 bh1792glc_meas_timeout_handler);
-                                */
-
+                                
+/*
     err_code = app_timer_create(&m_bh1792glc_timer_id,
                                 APP_TIMER_MODE_REPEATED,
                                 timer_isr);
+                                */
     APP_ERROR_CHECK(err_code);
 }
 
@@ -505,8 +509,21 @@ static void application_timers_start(void)
     ret_code_t err_code;
 
     // Start application timers.
+    //err_code = app_timer_start(m_battery_timer_id, BATTERY_LEVEL_MEAS_INTERVAL, NULL);
     err_code = app_timer_start(m_bh1792glc_timer_id, BH1792GLC_MEAS_INTERVAL, NULL);
     APP_ERROR_CHECK(err_code);
+}
+
+/**@brief Function starting the internal LFCLK oscillator.
+ *
+ * @details This is needed by RTC1 which is used by the Application Timer
+ *          (When SoftDevice is enabled the LFCLK is always running and this is not needed).
+ */
+static void lfclk_request(void)
+{
+    ret_code_t err_code = nrf_drv_clock_init();
+    APP_ERROR_CHECK(err_code);
+    nrf_drv_clock_lfclk_request(NULL);
 }
 
 /**
@@ -516,6 +533,7 @@ int main(void)
 {
     APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
     NRF_LOG_DEFAULT_BACKENDS_INIT();
+    lfclk_request();
 
     gpio_init();
     timers_init();

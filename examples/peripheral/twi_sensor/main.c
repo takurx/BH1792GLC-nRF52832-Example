@@ -97,7 +97,7 @@ APP_TIMER_DEF(m_bh1792glc_timer_id);
 //APP_TIMER_DEF(m_battery_timer_id);                                                  /**< Battery timer. */
 //BLE_BAS_DEF(m_bas);  
 
-#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(32)
+#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(31)
 //#define BATTERY_LEVEL_MEAS_INTERVAL     APP_TIMER_TICKS(2000)                       /**< Battery level measurement interval (ticks). */
 //#define MIN_BATTERY_LEVEL               81                                          /**< Minimum battery level as returned by the simulated measurement function. */
 //#define MAX_BATTERY_LEVEL               100                                         /**< Maximum battery level as returned by the simulated measurement function. */
@@ -153,6 +153,8 @@ __STATIC_INLINE void data_handler(uint8_t temp)
 
 void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
 {
+    NRF_LOG_INFO("twi_handler.");
+    /*
     switch (p_event->type)
     {
         case NRF_DRV_TWI_EVT_DONE:
@@ -166,6 +168,7 @@ void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
         default:
             break;
     }
+    */
 }
 
 bh1792_t      m_bh1792;
@@ -230,10 +233,11 @@ void twi_init (void)
     //error_check(ret, "bh1792_SetParams");
     NRF_LOG_INFO("finished bh1792_SetParams.");
 
-    NRF_LOG_INFO("GDATA(@LED_ON),GDATA(@LED_OFF)\n");
+    //NRF_LOG_INFO("GDATA(@LED_ON),GDATA(@LED_OFF)\n");
 
     ret = bh1792_StartMeasure();
     //error_check(ret, "bh1792_StartMeasure");
+    NRF_LOG_INFO("finished bh1792_StartMeasure.");
 
     //attachInterrupt(0, bh1792_isr, LOW);
 
@@ -540,15 +544,15 @@ int main(void)
     twi_init();
     NRF_LOG_INFO("finished twi init.");
     application_timers_start();
-    NRF_LOG_INFO("advertise start.");
+    NRF_LOG_INFO("application_timers start.");
     //LM75B_set_mode();
 
     while (true)
     {
         // Do nothing.
+        
+        nrf_delay_ms(500);
         /*
-        //nrf_delay_ms(500);
-
         do
         {
             __WFE();

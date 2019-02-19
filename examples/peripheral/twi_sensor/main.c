@@ -299,27 +299,34 @@ void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
     //EIMSK = bit(INT0); // set INT0 Enable Interrupt MaSK register
 }
 
-/*
 // Note:  I2C access should be completed within 0.5ms
 int32_t i2c_write(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size)
 {
-  //byte rc;
-  uint8_t rc;
+    //byte rc;
+    uint8_t rc;
+    ret_code_t err_code;
 
-  if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
-    if((slv_adr != BH1792_SLAVE_ADDR) || (reg_adr != BH1792_ADDR_MEAS_SYNC)) {
-      while(FlexiTimer2::count == 1999);
+    /*
+    if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
+      if((slv_adr != BH1792_SLAVE_ADDR) || (reg_adr != BH1792_ADDR_MEAS_SYNC)) {
+        while(FlexiTimer2::count == 1999);
+      }
     }
-  }
 
-  Wire.beginTransmission(slv_adr);
-  Wire.write(reg_adr);
-  Wire.write(reg, reg_size);
-  rc = Wire.endTransmission(true);
+    Wire.beginTransmission(slv_adr);
+    Wire.write(reg_adr);
+    Wire.write(reg, reg_size);
+    rc = Wire.endTransmission(true);
+    */
 
-  return rc;
+    err_code = nrf_drv_twi_tx(&m_twi, slv_adr, reg, reg_size, false);
+    APP_ERROR_CHECK(err_code);
+
+    //return rc;
+    return true;
 }
 
+/*
 // Note:  I2C access should be completed within 0.5ms
 int32_t i2c_read(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size)
 {

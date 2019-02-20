@@ -96,8 +96,8 @@
 #endif
 
 APP_TIMER_DEF(m_bh1792glc_timer_id);
-#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(2000)
-//#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(31)
+//#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(2000)
+#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(31)
 /* Indicates if operation on TWI has ended. */
 static volatile bool m_xfer_done = false;
 
@@ -215,11 +215,12 @@ void twi_init (void)
     m_bh1792.prm.led_cur2 = BH1792_PRM_LED_CUR2_MA(0);
     m_bh1792.prm.ir_th    = 0xFFFC;
     m_bh1792.prm.int_sel  = BH1792_PRM_INT_SEL_SGL;//BH1792_PRM_INT_SEL_WTM;
+    NRF_LOG_INFO("before bh1792_SetParams.");
     ret = bh1792_SetParams();
     //error_check(ret, "bh1792_SetParams");
     NRF_LOG_INFO("finished bh1792_SetParams.");
 
-    NRF_LOG_INFO("GDATA(@LED_ON),GDATA(@LED_OFF)\n");
+    //NRF_LOG_INFO("GDATA(@LED_ON),GDATA(@LED_OFF)\n");
 
     ret = bh1792_StartMeasure();
     //error_check(ret, "bh1792_StartMeasure");
@@ -229,6 +230,7 @@ void twi_init (void)
 
 /*
     //FlexiTimer2::stop();
+    // m_bh1792.prm.msr = BH1792_PRM_MSR_SINGLE, 32Hz
     if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
       //FlexiTimer2::set(2000, 5.0/10000, timer_isr);    // 1Hz timer
     } else {
@@ -247,12 +249,15 @@ static void timer_isr(void * p_context)
     NRF_LOG_INFO("timer_isr.");
     
     int32_t ret = 0;
-    //uint8_t tmp_eimsk;
+    uint8_t tmp_eimsk;
 
     //tmp_eimsk = EIMSK; //EIMSK Enable Interrupt MaSK register, set:1 enable, set:0 disable
     //EIMSK = 0; //EIMSK Enable Interrupt MaSK register, set:1 enable, set:0 disable
     //interrupts(); // enable interrupt
+    nrf_drv_gpiote_in_event_disable(ARDUINO_10_PIN);
 
+    // m_bh1792.prm.msr      = BH1792_PRM_MSR_SINGLE, else
+    /*
     if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
       ret = bh1792_SetSync();
       //error_check(ret, "bh1792_SetSync");
@@ -268,12 +273,15 @@ static void timer_isr(void * p_context)
         }
       }
     } else {
+    */
       ret = bh1792_StartMeasure();
       //error_check(ret, "bh1792_StartMeasure");
+    /*
     }
-    
+    */
     //noInterrupts(); // disable interrupt
     //EIMSK |= tmp_eimsk; // undo Enable Interrupt MaSK register
+    nrf_drv_gpiote_in_event_enable(ARDUINO_10_PIN, true);
 }
 
 //void bh1792_isr(void)
@@ -284,10 +292,13 @@ void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 
     //EIMSK = 0; //EIMSK Enable Interrupt MaSK register, set:1 enable, set:0 disable
     //interrupts(); // enable interrupt
+    nrf_drv_gpiote_in_event_disable(ARDUINO_10_PIN);
 
     ret = bh1792_GetMeasData(&m_bh1792_dat);
     //error_check(ret, "bh1792_GetMeasData");
 
+    // m_bh1792.prm.msr      = BH1792_PRM_MSR_SINGLE, else
+    /*
     if(m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
       for (i = 0; i < m_bh1792_dat.fifo_lev; i++) {
         NRF_LOG_INFO("%d", m_bh1792_dat.fifo[i].on);
@@ -295,6 +306,7 @@ void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
         NRF_LOG_INFO("%d\n", m_bh1792_dat.fifo[i].off);
       }
     } else {
+    */
       if(m_bh1792.prm.sel_adc == BH1792_PRM_SEL_ADC_GREEN) {
         NRF_LOG_INFO("%d", m_bh1792_dat.green.on);
         NRF_LOG_INFO(",");
@@ -304,10 +316,13 @@ void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
         NRF_LOG_INFO(",");
         NRF_LOG_INFO("%d\n", m_bh1792_dat.ir.off);
       }
+      /*
     }
+*/
 
     //noInterrupts(); // disable interrupt
     //EIMSK = bit(INT0); // set INT0 Enable Interrupt MaSK register
+    nrf_drv_gpiote_in_event_enable(ARDUINO_10_PIN, true);
 }
 
 // Note:  I2C access should be completed within 0.5ms
@@ -318,6 +333,7 @@ int32_t i2c_write(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_si
     ret_code_t err_code;
 
     /*
+    // m_bh1792.prm.msr      = BH1792_PRM_MSR_SINGLE, none
     if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
       if((slv_adr != BH1792_SLAVE_ADDR) || (reg_adr != BH1792_ADDR_MEAS_SYNC)) {
         while(FlexiTimer2::count == 1999);
@@ -346,6 +362,7 @@ int32_t i2c_read(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_siz
     ret_code_t err_code;
 
     /*
+    // m_bh1792.prm.msr      = BH1792_PRM_MSR_SINGLE, none
     if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
       while(FlexiTimer2::count == 1999);
     }
@@ -547,8 +564,9 @@ int main(void)
     gpio_init();
     timers_init();
     
-    NRF_LOG_INFO("\r\nTWI sensor example started.");
-    NRF_LOG_FLUSH();
+    NRF_LOG_INFO("TWI sensor example started.");
+    //NRF_LOG_FLUSH();
+    NRF_LOG_INFO("1111");
     twi_init();
     NRF_LOG_INFO("finished twi init.");
     application_timers_start();
@@ -557,17 +575,17 @@ int main(void)
 
     while (true)
     {
-    /*
-        nrf_delay_ms(500);
-
+    
+        //nrf_delay_ms(500);
+/*
         do
         {
             __WFE();
         }while (m_xfer_done == false);
-
-        read_sensor_data();
-        NRF_LOG_FLUSH();
-    */
+*/
+        //read_sensor_data();
+        //NRF_LOG_FLUSH();
+    
     }
 }
 

@@ -23,7 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 #include <bh1792.h>
-
+#include "nrf_log.h"
 
 // Global Variables
 
@@ -122,7 +122,9 @@ int32_t bh1792_SetParams(void)
         reg_size = 7U;
     }
  
+    NRF_LOG_INFO("set_params, i2c");
     ret_i2c = s_pBH1792->fnWrite(BH1792_SLAVE_ADDR, BH1792_ADDR_MEAS_CTRL1, reg, reg_size);
+    NRF_LOG_INFO("set_params, fnwrite");
     if(ret_i2c != 0) {
         s_pBH1792->i2c_err = ret_i2c;
         ret = BH1792_I2C_ERR;

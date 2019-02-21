@@ -96,8 +96,8 @@
 #endif
 
 APP_TIMER_DEF(m_bh1792glc_timer_id);
-#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(1000)
-//#defne BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(200)
+//#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(1000)
+#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(25)
 /* Indicates if operation on TWI has ended. */
 static volatile bool m_xfer_done = false;
 
@@ -173,9 +173,11 @@ void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
                     break;
                 case NRF_DRV_TWI_XFER_RX:
                     twi_rx_done = true;
+                    m_xfer_done = true;
                     break;
                 case NRF_DRV_TWI_XFER_TXRX:
                     twi_rx_done = true;
+                    m_xfer_done = true;
                     break;
                 default:
                     break;
@@ -277,7 +279,7 @@ void twi_init (void)
 //void timer_isr(void)
 static void timer_isr(void * p_context)
 {
-    NRF_LOG_INFO("timer_isr.");
+    //NRF_LOG_INFO("timer_isr.");
     
     int32_t ret = 0;
     //uint8_t tmp_eimsk;
@@ -339,13 +341,19 @@ void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
     } else {
     */
       if(m_bh1792.prm.sel_adc == BH1792_PRM_SEL_ADC_GREEN) {
+        NRF_LOG_RAW_INFO("%d,%d\n", m_bh1792_dat.green.on, m_bh1792_dat.green.off)
+        /*
         NRF_LOG_INFO("%d", m_bh1792_dat.green.on);
         NRF_LOG_INFO(",");
         NRF_LOG_INFO("%d\n", m_bh1792_dat.green.off);
+        */
       } else {
+        NRF_LOG_RAW_INFO("%d,%d\n", m_bh1792_dat.ir.on, m_bh1792_dat.ir.off)
+        /*
         NRF_LOG_INFO("%d", m_bh1792_dat.ir.on);
         NRF_LOG_INFO(",");
         NRF_LOG_INFO("%d\n", m_bh1792_dat.ir.off);
+        */
       }
       /*
     }
@@ -669,7 +677,7 @@ int main(void)
     while (true)
     {
     
-        nrf_delay_ms(500);
+        //nrf_delay_ms(100);
 /*
         do
         {
@@ -678,13 +686,14 @@ int main(void)
 */
         //read_sensor_data();
         //nrf_delay_ms(100);
-        /*
+        
         do
         {
             __WFE();
-        }while (twi_rx_done == false);
-        */
+        }while (m_xfer_done == false);
+        
         NRF_LOG_FLUSH();
+        m_xfer_done = false;
     
     }
 }

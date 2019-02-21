@@ -341,7 +341,8 @@ void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
     } else {
     */
       if(m_bh1792.prm.sel_adc == BH1792_PRM_SEL_ADC_GREEN) {
-        NRF_LOG_RAW_INFO("%d,%d\n", m_bh1792_dat.green.on, m_bh1792_dat.green.off)
+        NRF_LOG_RAW_INFO("%d,%d,%d,%d\n", m_bh1792_dat.green.on, m_bh1792_dat.green.off, m_bh1792_dat.ir.on, m_bh1792_dat.ir.off)
+        //NRF_LOG_RAW_INFO("%d,%d\n", m_bh1792_dat.green.on, m_bh1792_dat.green.off)
         /*
         NRF_LOG_INFO("%d", m_bh1792_dat.green.on);
         NRF_LOG_INFO(",");

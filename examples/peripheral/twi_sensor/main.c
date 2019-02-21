@@ -1,4 +1,31 @@
 /**
+ * The 3-Clause BSD License
+ * Copyright 2019 takurx
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation and/or
+ * other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors may be
+ * used to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+/**
  * Copyright (c) 2015 - 2018, Nordic Semiconductor ASA
  *
  * All rights reserved.
@@ -70,16 +97,16 @@
 #define TWI_INSTANCE_ID     0
 
 /* Common addresses definition for temperature sensor. */
-#define LM75B_ADDR          (0x90U >> 1)
+//#define LM75B_ADDR          (0x90U >> 1)
 // #define BH1792GLC_ADDR      0x5BU -> bh1792.h BH1792_SLAVE_ADDR
 
-#define LM75B_REG_TEMP      0x00U
-#define LM75B_REG_CONF      0x01U
-#define LM75B_REG_THYST     0x02U
-#define LM75B_REG_TOS       0x03U
+//#define LM75B_REG_TEMP      0x00U
+//#define LM75B_REG_CONF      0x01U
+//#define LM75B_REG_THYST     0x02U
+//#define LM75B_REG_TOS       0x03U
 
 /* Mode for LM75B. */
-#define NORMAL_MODE 0U
+//#define NORMAL_MODE 0U
 
 #ifdef BSP_BUTTON_0
     #define PIN_IN BSP_BUTTON_0
@@ -105,38 +132,41 @@ static volatile bool m_xfer_done = false;
 static const nrf_drv_twi_t m_twi = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID);
 
 /* Buffer for samples read from temperature sensor. */
-static uint8_t m_sample;
+//static uint8_t m_sample;
 
 /**
  * @brief Function for setting active mode on MMA7660 accelerometer.
  */
+/*
 void LM75B_set_mode(void)
 {
     ret_code_t err_code;
 
-    /* Writing to LM75B_REG_CONF "0" set temperature sensor in NORMAL mode. */
+    // Writing to LM75B_REG_CONF "0" set temperature sensor in NORMAL mode.
     uint8_t reg[2] = {LM75B_REG_CONF, NORMAL_MODE};
     err_code = nrf_drv_twi_tx(&m_twi, LM75B_ADDR, reg, sizeof(reg), false);
     APP_ERROR_CHECK(err_code);
     while (m_xfer_done == false);
 
-    /* Writing to pointer byte. */
+    // Writing to pointer byte.
     reg[0] = LM75B_REG_TEMP;
     m_xfer_done = false;
     err_code = nrf_drv_twi_tx(&m_twi, LM75B_ADDR, reg, 1, false);
     APP_ERROR_CHECK(err_code);
     while (m_xfer_done == false);
 }
-
+*/
 /**
  * @brief Function for handling data from temperature sensor.
  *
  * @param[in] temp          Temperature in Celsius degrees read from sensor.
  */
+/*
 __STATIC_INLINE void data_handler(uint8_t temp)
 {
     NRF_LOG_INFO("Temperature: %d Celsius degrees.", temp);
 }
+*/
 
 volatile static bool twi_tx_done = false;
 volatile static bool twi_rx_done = false;
@@ -515,15 +545,16 @@ void error_check(int32_t ret, String msg)
 /**
  * @brief Function for reading data from temperature sensor.
  */
+/*
 static void read_sensor_data()
 {
     m_xfer_done = false;
 
-    /* Read 1 byte from the specified address - skip 3 bits dedicated for fractional part of temperature. */
+    // Read 1 byte from the specified address - skip 3 bits dedicated for fractional part of temperature. 
     ret_code_t err_code = nrf_drv_twi_rx(&m_twi, LM75B_ADDR, &m_sample, sizeof(m_sample));
     APP_ERROR_CHECK(err_code);
 }
-
+*/
 void in_pin_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
     nrf_drv_gpiote_out_toggle(PIN_OUT);
@@ -577,7 +608,7 @@ static void gpio_init(void)
 static void bh1792glc_meas_timeout_handler(void * p_context)
 {
     //UNUSED_PARAMETER(p_context);
-    ret_code_t err_code;
+    //ret_code_t err_code;
     //uint8_t  battery_level;
 
     //NRF_LOG_INFO("bh1792glc measure timer interrupt.");
@@ -668,7 +699,6 @@ int main(void)
     
     NRF_LOG_INFO("TWI sensor example started.");
     NRF_LOG_FLUSH();
-    NRF_LOG_INFO("1111");
     twi_init();
     NRF_LOG_INFO("finished twi init.");
     application_timers_start();

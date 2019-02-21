@@ -97,7 +97,7 @@
 
 APP_TIMER_DEF(m_bh1792glc_timer_id);
 #define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(1000)
-//#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(31)
+//#defne BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(200)
 /* Indicates if operation on TWI has ended. */
 static volatile bool m_xfer_done = false;
 
@@ -280,7 +280,7 @@ static void timer_isr(void * p_context)
     NRF_LOG_INFO("timer_isr.");
     
     int32_t ret = 0;
-    uint8_t tmp_eimsk;
+    //uint8_t tmp_eimsk;
 
     //tmp_eimsk = EIMSK; //EIMSK Enable Interrupt MaSK register, set:1 enable, set:0 disable
     //EIMSK = 0; //EIMSK Enable Interrupt MaSK register, set:1 enable, set:0 disable
@@ -658,7 +658,7 @@ int main(void)
     timers_init();
     
     NRF_LOG_INFO("TWI sensor example started.");
-    //NRF_LOG_FLUSH();
+    NRF_LOG_FLUSH();
     NRF_LOG_INFO("1111");
     twi_init();
     NRF_LOG_INFO("finished twi init.");
@@ -677,7 +677,14 @@ int main(void)
         }while (m_xfer_done == false);
 */
         //read_sensor_data();
-        //NRF_LOG_FLUSH();
+        //nrf_delay_ms(100);
+        /*
+        do
+        {
+            __WFE();
+        }while (twi_rx_done == false);
+        */
+        NRF_LOG_FLUSH();
     
     }
 }

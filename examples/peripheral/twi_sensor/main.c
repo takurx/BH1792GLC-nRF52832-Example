@@ -357,6 +357,10 @@ void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 }
 
 #define BH1792_TWI_TIMEOUT 			10000 
+#define BH1792_TWI_BUFFER_SIZE     	8 // 8byte = tx max(7) + addr(1)
+
+uint8_t twi_tx_buffer[BH1792_TWI_BUFFER_SIZE];
+
 
 // Note:  I2C access should be completed within 0.5ms
 int32_t i2c_write(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size)
@@ -384,24 +388,40 @@ int32_t i2c_write(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_si
     */
     uint32_t timeout = BH1792_TWI_TIMEOUT;
 
+    /*
     uint8_t packet[2] = {reg_adr, reg[0]};
 
     err_code = nrf_drv_twi_tx(&m_twi, slv_adr, &packet[0], 2, false);
-    if(err_code != NRF_SUCCESS)
-    {
-      return err_code;
-    }
-
-    while((!twi_tx_done) && --timeout)
-    {
-      ;
-    }
-    if(!timeout)
-    {
-      return NRF_ERROR_TIMEOUT;
-    }
-
+    if(err_code != NRF_SUCCESS) return err_code;
+    while((!twi_tx_done) && --timeout) ;
+    if(!timeout) return NRF_ERROR_TIMEOUT;
     twi_tx_done = false;
+    */
+
+    twi_tx_buffer[0] = reg_adr;
+    memcpy(&twi_tx_buffer[1], &reg[0], reg_size);
+    
+    err_code = nrf_drv_twi_tx(&m_twi, slv_adr, &twi_tx_buffer[0], reg_size + 1, false);
+    if(err_code != NRF_SUCCESS) return err_code;
+    while((!twi_tx_done) && --timeout) ;
+    if(!timeout) return NRF_ERROR_TIMEOUT;
+    twi_tx_done = false;
+
+    /*
+    err_code = nrf_drv_twi_tx(&m_twi, slv_adr, &reg_adr, 1, false);
+    if(err_code != NRF_SUCCESS) return err_code;
+    while((!twi_tx_done) && --timeout) ;
+    if(!timeout) return NRF_ERROR_TIMEOUT;
+    twi_tx_done = false;
+    
+    if(reg_size > 0){
+    err_code = nrf_drv_twi_tx(&m_twi, slv_adr, reg, reg_size, false);
+    if(err_code != NRF_SUCCESS) return err_code;
+    while((!twi_tx_done) && --timeout) ;
+    if(!timeout) return NRF_ERROR_TIMEOUT;
+    twi_tx_done = false;
+    }
+    */
 
     //return rc;
     return 0;

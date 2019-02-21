@@ -2,6 +2,10 @@
 <session>
  <Bookmarks/>
  <Breakpoints groups="Breakpoints" active_group="Breakpoints">
+  <BreakpointListItem trigger="" line="80" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="../../../../../../BH1792GLC/bh1792.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="84" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="../../../../../../BH1792GLC/bh1792.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="90" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="../../../../../../BH1792GLC/bh1792.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="398" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="../../../main.c" useHWbreakpoint="false"/>
   <Exceptions set="MemManage;UsageFault_Coprocessor;UsageFault_CheckingError;UsageFault_StateError;BusFault;ExceptionEntryReturnFault;HardFault"/>
  </Breakpoints>
  <ExecutionProfileWindow/>
@@ -49,7 +53,9 @@
   <Trace enabled="Yes"/>
  </TraceWindow>
  <Watch1>
-  <Watches active="1" update="Never"/>
+  <Watches active="1" update="Never">
+   <Watchpoint numelements="0" expression="reg_size" evalMode="0" name="reg_size" radix="16" linenumber="366" filename="../../../main.c" list=""/>
+  </Watches>
  </Watch1>
  <Watch2>
   <Watches active="0" update="Never"/>
@@ -61,8 +67,10 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="532" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="364" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="65" useTextEdit="1" useBinaryEdit="0" left="0" path="twi_sensor_pca10040.emProject" selected="0" top="55" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="49" y="359" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="385" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../BH1792GLC/bh1792.h" selected="0" top="170" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="12" y="148" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../BH1792GLC/bh1792.c" selected="0" top="175" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="534" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../integration/nrfx/legacy/nrf_drv_twi.h" selected="0" top="522" codecName="Default"/>
  </Files>
- <ARMCrossStudioWindow activeProject="twi_sensor_pca10040" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Release" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3711"/>
+ <ARMCrossStudioWindow activeProject="twi_sensor_pca10040" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Release" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

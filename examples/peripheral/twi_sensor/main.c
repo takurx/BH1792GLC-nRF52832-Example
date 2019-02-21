@@ -96,8 +96,8 @@
 #endif
 
 APP_TIMER_DEF(m_bh1792glc_timer_id);
-//#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(2000)
-#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(31)
+#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(1000)
+//#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(31)
 /* Indicates if operation on TWI has ended. */
 static volatile bool m_xfer_done = false;
 
@@ -669,7 +669,7 @@ int main(void)
     while (true)
     {
     
-        //nrf_delay_ms(500);
+        nrf_delay_ms(500);
 /*
         do
         {

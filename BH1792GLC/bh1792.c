@@ -24,7 +24,6 @@
 
 #include <bh1792.h>
 
-
 // Global Variables
 
 

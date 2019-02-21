@@ -50,6 +50,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "nrf.h"
+#include "nrf_drv_timer.h"
 #include "nrf_drv_gpiote.h"
 #include "boards.h"
 #include "app_util_platform.h"
@@ -61,6 +62,9 @@
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
+
+#include "app_timer.h"
+#include "nrf_drv_clock.h"
 
 /* TWI instance ID. */
 #define TWI_INSTANCE_ID     0
@@ -91,6 +95,9 @@
     #error "Please indicate output pin"
 #endif
 
+APP_TIMER_DEF(m_bh1792glc_timer_id);
+//#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(1000)
+#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(25)
 /* Indicates if operation on TWI has ended. */
 static volatile bool m_xfer_done = false;
 
@@ -131,11 +138,15 @@ __STATIC_INLINE void data_handler(uint8_t temp)
     NRF_LOG_INFO("Temperature: %d Celsius degrees.", temp);
 }
 
+volatile static bool twi_tx_done = false;
+volatile static bool twi_rx_done = false;
+
 /**
  * @brief TWI events handler.
  */
 void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
 {
+    /*
     switch (p_event->type)
     {
         case NRF_DRV_TWI_EVT_DONE:
@@ -148,10 +159,44 @@ void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
         default:
             break;
     }
+    */
+    switch(p_event->type)
+    {
+        case NRF_DRV_TWI_EVT_DONE:
+            switch(p_event->xfer_desc.type)
+            {
+                case NRF_DRV_TWI_XFER_TX:
+                    twi_tx_done = true;
+                    break;
+                case NRF_DRV_TWI_XFER_TXTX:
+                    twi_tx_done = true;
+                    break;
+                case NRF_DRV_TWI_XFER_RX:
+                    twi_rx_done = true;
+                    m_xfer_done = true;
+                    break;
+                case NRF_DRV_TWI_XFER_TXRX:
+                    twi_rx_done = true;
+                    m_xfer_done = true;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case NRF_DRV_TWI_EVT_ADDRESS_NACK:
+            break;
+        case NRF_DRV_TWI_EVT_DATA_NACK:
+            break;
+        default:
+            break;
+    }
 }
 
 bh1792_t      m_bh1792;
 bh1792_data_t m_bh1792_dat;
+
+int32_t i2c_write(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size);
+int32_t i2c_read(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size);
 
 /**
  * @brief UART initialization.
@@ -159,7 +204,9 @@ bh1792_data_t m_bh1792_dat;
 void twi_init (void)
 {
     ret_code_t err_code;
-
+    int32_t ret = 0;
+  
+    /*
     const nrf_drv_twi_config_t twi_lm75b_config = {
        .scl                = ARDUINO_SCL_PIN,
        .sda                = ARDUINO_SDA_PIN,
@@ -167,9 +214,10 @@ void twi_init (void)
        .interrupt_priority = APP_IRQ_PRIORITY_HIGH,
        .clear_bus_init     = false
     };
-
+    
     err_code = nrf_drv_twi_init(&m_twi, &twi_lm75b_config, twi_handler, NULL);
     APP_ERROR_CHECK(err_code);
+    */
 
     const nrf_drv_twi_config_t twi_bh1792glc_config = {
        .scl                = ARDUINO_SCL_PIN,
@@ -179,11 +227,289 @@ void twi_init (void)
        .clear_bus_init     = false
     };
 
+    NRF_LOG_INFO("before nrf_drv_twi_init.");
     err_code = nrf_drv_twi_init(&m_twi, &twi_bh1792glc_config, twi_handler, NULL);
+    NRF_LOG_INFO("finished nrf_drv_twi_init.");
     APP_ERROR_CHECK(err_code);
 
     nrf_drv_twi_enable(&m_twi);
+
+    // BH1792
+    m_bh1792.fnWrite      = i2c_write;
+    m_bh1792.fnRead       = i2c_read;
+    ret = bh1792_Init(&m_bh1792);
+    NRF_LOG_INFO("finished bh1792_Init.");
+    //error_check(ret, "bh1792_Init");
+
+    m_bh1792.prm.sel_adc  = BH1792_PRM_SEL_ADC_GREEN;
+    m_bh1792.prm.msr      = BH1792_PRM_MSR_SINGLE;//BH1792_PRM_MSR_1024HZ;
+    m_bh1792.prm.led_en   = (BH1792_PRM_LED_EN1_0 << 1) | BH1792_PRM_LED_EN2_0;
+    m_bh1792.prm.led_cur1 = BH1792_PRM_LED_CUR1_MA(1);
+    m_bh1792.prm.led_cur2 = BH1792_PRM_LED_CUR2_MA(0);
+    m_bh1792.prm.ir_th    = 0xFFFC;
+    m_bh1792.prm.int_sel  = BH1792_PRM_INT_SEL_SGL;//BH1792_PRM_INT_SEL_WTM;
+    NRF_LOG_INFO("before bh1792_SetParams.");
+    ret = bh1792_SetParams();
+    //error_check(ret, "bh1792_SetParams");
+    NRF_LOG_INFO("finished bh1792_SetParams.");
+
+    //NRF_LOG_INFO("GDATA(@LED_ON),GDATA(@LED_OFF)\n");
+
+    ret = bh1792_StartMeasure();
+    //error_check(ret, "bh1792_StartMeasure");
+    NRF_LOG_INFO("finished bh1792_StartMeasure.");
+
+    //attachInterrupt(0, bh1792_isr, LOW);
+
+/*
+    //FlexiTimer2::stop();
+    // m_bh1792.prm.msr = BH1792_PRM_MSR_SINGLE, 32Hz
+    if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
+      //FlexiTimer2::set(2000, 5.0/10000, timer_isr);    // 1Hz timer
+    } else {
+      //FlexiTimer2::set(250, 1.0/8000, timer_isr);      // 32Hz timer
+    }
+    //FlexiTimer2::start();
+
+    //nrf_drv_twi_enable(&m_twi);
+*/
+
 }
+
+//void timer_isr(void)
+static void timer_isr(void * p_context)
+{
+    //NRF_LOG_INFO("timer_isr.");
+    
+    int32_t ret = 0;
+    //uint8_t tmp_eimsk;
+
+    //tmp_eimsk = EIMSK; //EIMSK Enable Interrupt MaSK register, set:1 enable, set:0 disable
+    //EIMSK = 0; //EIMSK Enable Interrupt MaSK register, set:1 enable, set:0 disable
+    //interrupts(); // enable interrupt
+    nrf_drv_gpiote_in_event_disable(ARDUINO_10_PIN);
+
+    // m_bh1792.prm.msr      = BH1792_PRM_MSR_SINGLE, else
+    /*
+    if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
+      ret = bh1792_SetSync();
+      //error_check(ret, "bh1792_SetSync");
+
+      if (m_bh1792.sync_seq < 3) {
+        if (m_bh1792.sync_seq == 1) {
+          //tmp_eimsk = 0;
+        } else {
+          ret = bh1792_ClearFifoData();
+          //error_check(ret, "bh1792_ClearFifoData");
+
+          //tmp_eimsk = bit(INT0);
+        }
+      }
+    } else {
+    */
+      ret = bh1792_StartMeasure();
+      //error_check(ret, "bh1792_StartMeasure");
+    /*
+    }
+    */
+    //noInterrupts(); // disable interrupt
+    //EIMSK |= tmp_eimsk; // undo Enable Interrupt MaSK register
+    nrf_drv_gpiote_in_event_enable(ARDUINO_10_PIN, true);
+}
+
+//void bh1792_isr(void)
+void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+{
+    int32_t ret = 0;
+    uint8_t i   = 0;
+
+    //EIMSK = 0; //EIMSK Enable Interrupt MaSK register, set:1 enable, set:0 disable
+    //interrupts(); // enable interrupt
+    nrf_drv_gpiote_in_event_disable(ARDUINO_10_PIN);
+
+    ret = bh1792_GetMeasData(&m_bh1792_dat);
+    //error_check(ret, "bh1792_GetMeasData");
+
+    // m_bh1792.prm.msr      = BH1792_PRM_MSR_SINGLE, else
+    /*
+    if(m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
+      for (i = 0; i < m_bh1792_dat.fifo_lev; i++) {
+        NRF_LOG_INFO("%d", m_bh1792_dat.fifo[i].on);
+        NRF_LOG_INFO(",");
+        NRF_LOG_INFO("%d\n", m_bh1792_dat.fifo[i].off);
+      }
+    } else {
+    */
+      if(m_bh1792.prm.sel_adc == BH1792_PRM_SEL_ADC_GREEN) {
+        NRF_LOG_RAW_INFO("%d,%d\n", m_bh1792_dat.green.on, m_bh1792_dat.green.off)
+        /*
+        NRF_LOG_INFO("%d", m_bh1792_dat.green.on);
+        NRF_LOG_INFO(",");
+        NRF_LOG_INFO("%d\n", m_bh1792_dat.green.off);
+        */
+      } else {
+        NRF_LOG_RAW_INFO("%d,%d\n", m_bh1792_dat.ir.on, m_bh1792_dat.ir.off)
+        /*
+        NRF_LOG_INFO("%d", m_bh1792_dat.ir.on);
+        NRF_LOG_INFO(",");
+        NRF_LOG_INFO("%d\n", m_bh1792_dat.ir.off);
+        */
+      }
+      /*
+    }
+*/
+
+    //noInterrupts(); // disable interrupt
+    //EIMSK = bit(INT0); // set INT0 Enable Interrupt MaSK register
+    nrf_drv_gpiote_in_event_enable(ARDUINO_10_PIN, true);
+}
+
+#define BH1792_TWI_TIMEOUT 			10000 
+#define BH1792_TWI_BUFFER_SIZE     	8 // 8byte = tx max(7) + addr(1)
+
+uint8_t twi_tx_buffer[BH1792_TWI_BUFFER_SIZE];
+
+
+// Note:  I2C access should be completed within 0.5ms
+int32_t i2c_write(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size)
+{
+    //byte rc;
+    //uint8_t rc;
+    ret_code_t err_code;
+
+    /*
+    // m_bh1792.prm.msr      = BH1792_PRM_MSR_SINGLE, none
+    if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
+      if((slv_adr != BH1792_SLAVE_ADDR) || (reg_adr != BH1792_ADDR_MEAS_SYNC)) {
+        while(FlexiTimer2::count == 1999);
+      }
+    }
+
+    Wire.beginTransmission(slv_adr);
+    Wire.write(reg_adr);
+    Wire.write(reg, reg_size);
+    rc = Wire.endTransmission(true);
+    */
+    /*
+    err_code = nrf_drv_twi_tx(&m_twi, slv_adr, reg, reg_size, false);
+    APP_ERROR_CHECK(err_code);
+    */
+    uint32_t timeout = BH1792_TWI_TIMEOUT;
+
+    /*
+    uint8_t packet[2] = {reg_adr, reg[0]};
+
+    err_code = nrf_drv_twi_tx(&m_twi, slv_adr, &packet[0], 2, false);
+    if(err_code != NRF_SUCCESS) return err_code;
+    while((!twi_tx_done) && --timeout) ;
+    if(!timeout) return NRF_ERROR_TIMEOUT;
+    twi_tx_done = false;
+    */
+
+    twi_tx_buffer[0] = reg_adr;
+    memcpy(&twi_tx_buffer[1], &reg[0], reg_size);
+    
+    err_code = nrf_drv_twi_tx(&m_twi, slv_adr, &twi_tx_buffer[0], reg_size + 1, false);
+    if(err_code != NRF_SUCCESS) return err_code;
+    while((!twi_tx_done) && --timeout) ;
+    if(!timeout) return NRF_ERROR_TIMEOUT;
+    twi_tx_done = false;
+
+    /*
+    err_code = nrf_drv_twi_tx(&m_twi, slv_adr, &reg_adr, 1, false);
+    if(err_code != NRF_SUCCESS) return err_code;
+    while((!twi_tx_done) && --timeout) ;
+    if(!timeout) return NRF_ERROR_TIMEOUT;
+    twi_tx_done = false;
+    
+    if(reg_size > 0){
+    err_code = nrf_drv_twi_tx(&m_twi, slv_adr, reg, reg_size, false);
+    if(err_code != NRF_SUCCESS) return err_code;
+    while((!twi_tx_done) && --timeout) ;
+    if(!timeout) return NRF_ERROR_TIMEOUT;
+    twi_tx_done = false;
+    }
+    */
+
+    //return rc;
+    return 0;
+}
+
+// Note:  I2C access should be completed within 0.5ms
+int32_t i2c_read(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size)
+{
+    //byte rc;
+    //uint8_t rc;
+    //uint8_t cnt;
+    ret_code_t err_code;
+
+    /*
+    // m_bh1792.prm.msr      = BH1792_PRM_MSR_SINGLE, none
+    if (m_bh1792.prm.msr <= BH1792_PRM_MSR_1024HZ) {
+      while(FlexiTimer2::count == 1999);
+    }
+    */
+
+    /*
+    Wire.beginTransmission(slv_adr);
+    Wire.write(reg_adr);
+    rc = Wire.endTransmission(false);
+    if (rc == 0) {
+      Wire.requestFrom((int32_t)slv_adr, (int32_t)reg_size, true);
+      cnt = 0;
+      while(Wire.available()) {
+        reg[cnt] = Wire.read();
+        cnt++;
+      }
+      if(cnt < reg_size) {
+        rc = 4;
+      }
+    }
+    */
+    /*
+    err_code = nrf_drv_twi_rx(&m_twi, slv_adr, reg, reg_size);
+    APP_ERROR_CHECK(err_code);
+    */
+
+    uint32_t timeout = BH1792_TWI_TIMEOUT;
+
+    err_code = nrf_drv_twi_tx(&m_twi, slv_adr, &reg_adr, 1, false);
+    if(err_code != NRF_SUCCESS) return err_code;
+
+    while((!twi_tx_done) && --timeout);
+    if(!timeout) return NRF_ERROR_TIMEOUT;
+    twi_tx_done = false;
+
+    err_code = nrf_drv_twi_rx(&m_twi, slv_adr, reg, reg_size);
+    if(err_code != NRF_SUCCESS) return err_code;
+
+    timeout = BH1792_TWI_TIMEOUT;
+    while((!twi_rx_done) && --timeout);
+    if(!timeout) return NRF_ERROR_TIMEOUT;
+    twi_rx_done = false;
+
+    //return rc;
+    return 0;
+}
+
+
+/*
+void error_check(int32_t ret, String msg)
+{
+  if(ret < 0) {
+    msg = "Error: " + msg;
+    msg += " function";
+    NRF_LOG_INFO("%s\n", msg);
+    NRF_LOG_INFO("ret = ");
+    NRF_LOG_INFO("%d", ret);
+    if(ret == BH1792_I2C_ERR) {
+      NRF_LOG_INFO("i2c_ret = ");
+      NRF_LOG_INFO("%d\n", m_bh1792.i2c_err);
+    }
+    while(1);
+  }
+}
+*/
 
 /**
  * @brief Function for reading data from temperature sensor.
@@ -212,11 +538,13 @@ static void gpio_init(void)
     err_code = nrf_drv_gpiote_init();
     APP_ERROR_CHECK(err_code);
 
+    // LED1
     nrf_drv_gpiote_out_config_t out_config = GPIOTE_CONFIG_OUT_SIMPLE(false);
 
     err_code = nrf_drv_gpiote_out_init(PIN_OUT, &out_config);
     APP_ERROR_CHECK(err_code);
 
+    // Button1
     nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
     in_config.pull = NRF_GPIO_PIN_PULLUP;
 
@@ -224,6 +552,105 @@ static void gpio_init(void)
     APP_ERROR_CHECK(err_code);
 
     nrf_drv_gpiote_in_event_enable(PIN_IN, true);
+
+    // bh1792glc, arudino_10_pin
+    nrf_drv_gpiote_in_config_t in_config_bh1792 = GPIOTE_CONFIG_IN_SENSE_HITOLO(true); // interrupt when falling edge
+    in_config_bh1792.pull = NRF_GPIO_PIN_PULLUP;
+
+    //err_code = nrf_drv_gpiote_in_init(ARDUINO_3_PIN, &in_config_bh1792, bh1792_isr);
+    err_code = nrf_drv_gpiote_in_init(ARDUINO_10_PIN, &in_config_bh1792, bh1792_isr);
+    APP_ERROR_CHECK(err_code);
+
+    //nrf_drv_gpiote_in_event_enable(ARDUINO_3_PIN, true);
+    nrf_drv_gpiote_in_event_enable(ARDUINO_10_PIN, true);
+}
+
+/**@brief Function for handling the Battery measurement timer timeout.
+ *
+ * @details This function will be called each time the battery level measurement timer expires.
+ *
+ * @param[in] p_context   Pointer used for passing some arbitrary information (context) from the
+ *                        app_start_timer() call to the timeout handler.
+ */
+
+static void bh1792glc_meas_timeout_handler(void * p_context)
+{
+    //UNUSED_PARAMETER(p_context);
+    ret_code_t err_code;
+    //uint8_t  battery_level;
+
+    //NRF_LOG_INFO("bh1792glc measure timer interrupt.");
+    timer_isr(p_context);
+    /*
+    battery_level = (uint8_t)sensorsim_measure(&m_battery_sim_state, &m_battery_sim_cfg);
+
+    err_code = ble_bas_battery_level_update(&m_bas, battery_level, BLE_CONN_HANDLE_ALL);
+    if ((err_code != NRF_SUCCESS) &&
+        (err_code != NRF_ERROR_INVALID_STATE) &&
+        (err_code != NRF_ERROR_RESOURCES) &&
+        (err_code != NRF_ERROR_BUSY) &&
+        (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING) &&
+        (err_code != NRF_ERROR_FORBIDDEN)
+       )
+    {
+        APP_ERROR_HANDLER(err_code);
+    }
+    */
+    
+}
+
+
+/**@brief Function for initializing the timer module.
+ */
+static void timers_init(void)
+{
+    ret_code_t err_code;
+
+    // Initialize timer module.
+    err_code = app_timer_init();
+    APP_ERROR_CHECK(err_code);
+
+    // Create timers.
+    /*
+    err_code = app_timer_create(&m_battery_timer_id,
+                                APP_TIMER_MODE_REPEATED,
+                                battery_level_meas_timeout_handler);
+                                */
+                                
+    err_code = app_timer_create(&m_bh1792glc_timer_id,
+                                APP_TIMER_MODE_REPEATED,
+                                bh1792glc_meas_timeout_handler);
+                                
+/*
+    err_code = app_timer_create(&m_bh1792glc_timer_id,
+                                APP_TIMER_MODE_REPEATED,
+                                timer_isr);
+                                */
+    APP_ERROR_CHECK(err_code);
+}
+
+/**@brief Function for starting application timers.
+ */
+static void application_timers_start(void)
+{
+    ret_code_t err_code;
+
+    // Start application timers.
+    //err_code = app_timer_start(m_battery_timer_id, BATTERY_LEVEL_MEAS_INTERVAL, NULL);
+    err_code = app_timer_start(m_bh1792glc_timer_id, BH1792GLC_MEAS_INTERVAL, NULL);
+    APP_ERROR_CHECK(err_code);
+}
+
+/**@brief Function starting the internal LFCLK oscillator.
+ *
+ * @details This is needed by RTC1 which is used by the Application Timer
+ *          (When SoftDevice is enabled the LFCLK is always running and this is not needed).
+ */
+static void lfclk_request(void)
+{
+    ret_code_t err_code = nrf_drv_clock_init();
+    APP_ERROR_CHECK(err_code);
+    nrf_drv_clock_lfclk_request(NULL);
 }
 
 /**
@@ -233,25 +660,41 @@ int main(void)
 {
     APP_ERROR_CHECK(NRF_LOG_INIT(NULL));
     NRF_LOG_DEFAULT_BACKENDS_INIT();
+    lfclk_request();
 
     gpio_init();
+    timers_init();
     
-    NRF_LOG_INFO("\r\nTWI sensor example started.");
+    NRF_LOG_INFO("TWI sensor example started.");
     NRF_LOG_FLUSH();
+    NRF_LOG_INFO("1111");
     twi_init();
-    LM75B_set_mode();
+    NRF_LOG_INFO("finished twi init.");
+    application_timers_start();
+    NRF_LOG_INFO("application_timers start.");
+    //LM75B_set_mode();
 
     while (true)
     {
-        nrf_delay_ms(500);
-
+    
+        //nrf_delay_ms(100);
+/*
         do
         {
             __WFE();
         }while (m_xfer_done == false);
-
-        read_sensor_data();
+*/
+        //read_sensor_data();
+        //nrf_delay_ms(100);
+        
+        do
+        {
+            __WFE();
+        }while (m_xfer_done == false);
+        
         NRF_LOG_FLUSH();
+        m_xfer_done = false;
+    
     }
 }
 

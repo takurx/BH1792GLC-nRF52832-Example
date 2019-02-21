@@ -113,6 +113,7 @@
 APP_TIMER_DEF(m_bh1792glc_timer_id);
 //#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(1000)
 #define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(25)
+
 /* Indicates if operation on TWI has ended (when received). */
 static volatile bool m_xfer_done = false;
 
@@ -121,6 +122,18 @@ static const nrf_drv_twi_t m_twi = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID);
 
 volatile static bool twi_tx_done = false;
 volatile static bool twi_rx_done = false;
+
+bh1792_t      m_bh1792;
+bh1792_data_t m_bh1792_dat;
+
+int32_t i2c_write(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size);
+int32_t i2c_read(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size);
+
+#define BH1792_TWI_TIMEOUT 			10000 
+#define BH1792_TWI_BUFFER_SIZE     	8 // 8byte = tx max(7) + addr(1)
+
+uint8_t twi_tx_buffer[BH1792_TWI_BUFFER_SIZE];
+
 
 /**
  * @brief TWI events handler.
@@ -159,11 +172,6 @@ void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
     }
 }
 
-bh1792_t      m_bh1792;
-bh1792_data_t m_bh1792_dat;
-
-int32_t i2c_write(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size);
-int32_t i2c_read(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size);
 
 /**
  * @brief UART initialization.
@@ -224,13 +232,11 @@ void twi_init (void)
       //FlexiTimer2::set(250, 1.0/8000, timer_isr);      // 32Hz timer
     }
     //FlexiTimer2::start();
-
-    //nrf_drv_twi_enable(&m_twi);
 */
 
 }
 
-//void timer_isr(void)
+
 static void timer_isr(void * p_context)
 {
     //UNUSED_PARAMETER(p_context);
@@ -272,7 +278,7 @@ static void timer_isr(void * p_context)
     nrf_drv_gpiote_in_event_enable(ARDUINO_10_PIN, true);
 }
 
-//void bh1792_isr(void)
+
 void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
     int32_t ret = 0;
@@ -314,11 +320,6 @@ void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
     nrf_drv_gpiote_in_event_enable(ARDUINO_10_PIN, true);
 }
 
-#define BH1792_TWI_TIMEOUT 			10000 
-#define BH1792_TWI_BUFFER_SIZE     	8 // 8byte = tx max(7) + addr(1)
-
-uint8_t twi_tx_buffer[BH1792_TWI_BUFFER_SIZE];
-
 
 // Note:  I2C access should be completed within 0.5ms
 int32_t i2c_write(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size)
@@ -354,6 +355,7 @@ int32_t i2c_write(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_si
     //return rc;
     return 0;
 }
+
 
 // Note:  I2C access should be completed within 0.5ms
 int32_t i2c_read(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size)
@@ -431,6 +433,8 @@ void in_pin_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
     nrf_drv_gpiote_out_toggle(PIN_OUT);
 }
+
+
 /**
  * @brief Function for configuring: PIN_IN pin for input, PIN_OUT pin for output,
  * and configures GPIOTE to give an interrupt on pin change.
@@ -467,6 +471,7 @@ static void gpio_init(void)
     nrf_drv_gpiote_in_event_enable(ARDUINO_10_PIN, true);
 }
 
+
 /**@brief Function for handling the BH1792GLC measurement timer timeout.
  *
  * @details This function will be called each time BH1792GLC measurement timer expires.
@@ -499,6 +504,7 @@ static void timers_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
+
 /**@brief Function for starting application timers.
  */
 static void application_timers_start(void)
@@ -509,6 +515,7 @@ static void application_timers_start(void)
     err_code = app_timer_start(m_bh1792glc_timer_id, BH1792GLC_MEAS_INTERVAL, NULL);
     APP_ERROR_CHECK(err_code);
 }
+
 
 /**@brief Function starting the internal LFCLK oscillator.
  *
@@ -521,6 +528,7 @@ static void lfclk_request(void)
     APP_ERROR_CHECK(err_code);
     nrf_drv_clock_lfclk_request(NULL);
 }
+
 
 /**
  * @brief Function for main application entry.

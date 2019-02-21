@@ -138,6 +138,9 @@ __STATIC_INLINE void data_handler(uint8_t temp)
     NRF_LOG_INFO("Temperature: %d Celsius degrees.", temp);
 }
 
+volatile static bool twi_tx_done = false;
+volatile static bool twi_rx_done = false;
+
 /**
  * @brief TWI events handler.
  */
@@ -157,6 +160,34 @@ void twi_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
             break;
     }
     */
+    switch(p_event->type)
+    {
+        case NRF_DRV_TWI_EVT_DONE:
+            switch(p_event->xfer_desc.type)
+            {
+                case NRF_DRV_TWI_XFER_TX:
+                    twi_tx_done = true;
+                    break;
+                case NRF_DRV_TWI_XFER_TXTX:
+                    twi_tx_done = true;
+                    break;
+                case NRF_DRV_TWI_XFER_RX:
+                    twi_rx_done = true;
+                    break;
+                case NRF_DRV_TWI_XFER_TXRX:
+                    twi_rx_done = true;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case NRF_DRV_TWI_EVT_ADDRESS_NACK:
+            break;
+        case NRF_DRV_TWI_EVT_DATA_NACK:
+            break;
+        default:
+            break;
+    }
 }
 
 bh1792_t      m_bh1792;
@@ -325,11 +356,13 @@ void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
     nrf_drv_gpiote_in_event_enable(ARDUINO_10_PIN, true);
 }
 
+#define BH1792_TWI_TIMEOUT 			10000 
+
 // Note:  I2C access should be completed within 0.5ms
 int32_t i2c_write(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_size)
 {
     //byte rc;
-    uint8_t rc;
+    //uint8_t rc;
     ret_code_t err_code;
 
     /*
@@ -345,9 +378,30 @@ int32_t i2c_write(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_si
     Wire.write(reg, reg_size);
     rc = Wire.endTransmission(true);
     */
-
+    /*
     err_code = nrf_drv_twi_tx(&m_twi, slv_adr, reg, reg_size, false);
     APP_ERROR_CHECK(err_code);
+    */
+    uint32_t timeout = BH1792_TWI_TIMEOUT;
+
+    uint8_t packet[2] = {reg_adr, reg[0]};
+
+    err_code = nrf_drv_twi_tx(&m_twi, slv_adr, &packet[0], 2, false);
+    if(err_code != NRF_SUCCESS)
+    {
+      return err_code;
+    }
+
+    while((!twi_tx_done) && --timeout)
+    {
+      ;
+    }
+    if(!timeout)
+    {
+      return NRF_ERROR_TIMEOUT;
+    }
+
+    twi_tx_done = false;
 
     //return rc;
     return 0;
@@ -384,8 +438,27 @@ int32_t i2c_read(uint8_t slv_adr, uint8_t reg_adr, uint8_t *reg, uint8_t reg_siz
       }
     }
     */
+    /*
     err_code = nrf_drv_twi_rx(&m_twi, slv_adr, reg, reg_size);
     APP_ERROR_CHECK(err_code);
+    */
+
+    uint32_t timeout = BH1792_TWI_TIMEOUT;
+
+    err_code = nrf_drv_twi_tx(&m_twi, slv_adr, &reg_adr, 1, false);
+    if(err_code != NRF_SUCCESS) return err_code;
+
+    while((!twi_tx_done) && --timeout);
+    if(!timeout) return NRF_ERROR_TIMEOUT;
+    twi_tx_done = false;
+
+    err_code = nrf_drv_twi_rx(&m_twi, slv_adr, reg, reg_size);
+    if(err_code != NRF_SUCCESS) return err_code;
+
+    timeout = BH1792_TWI_TIMEOUT;
+    while((!twi_rx_done) && --timeout);
+    if(!timeout) return NRF_ERROR_TIMEOUT;
+    twi_rx_done = false;
 
     //return rc;
     return 0;

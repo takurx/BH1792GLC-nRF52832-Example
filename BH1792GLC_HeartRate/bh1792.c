@@ -48,8 +48,8 @@ static int8_t bh1792_IsExist(void);
 // @param[inout] : None
 // @retval       : int8_t
 //                   BH1792_SUCCESS       => OK
-//                   BH1792_RC_NO_EXIST => No BH1792 exists
-//                   BH1792_RC_I2C_ERR  => I2C error with BH1792
+//                   BH1792_I2C_ERR => No BH1792 exists
+//                   BH1792_NOT_EXIST  => I2C error with BH1792
 //===============================================================================
 int8_t bh1792_Init(void)
 {
@@ -71,7 +71,7 @@ int8_t bh1792_Init(void)
 // @param[inout] : None
 // @retval       : int8_t
 //                   BH1792_SUCCESS       => OK
-//                   BH1792_RC_I2C_ERR  => I2C error with BH1792
+//                   BH1792_NOT_EXIST  => I2C error with BH1792
 //===============================================================================
 int8_t bh1792_SoftReset(void)
 {
@@ -95,7 +95,7 @@ int8_t bh1792_SoftReset(void)
 // @param[inout] : None
 // @retval       : int8_t
 //                   BH1792_SUCCESS       => OK
-//                   BH1792_RC_I2C_ERR  => I2C error with BH1792
+//                   BH1792_NOT_EXIST  => I2C error with BH1792
 //===============================================================================
 //int8_t bh1792_Write(uint8_t adr, uint8_t *data, uint8_t size)
 
@@ -109,7 +109,7 @@ int8_t bh1792_SoftReset(void)
 // @param[inout] : None
 // @retval       : int8_t
 //                   BH1792_SUCCESS       => OK
-//                   BH1792_RC_I2C_ERR  => I2C error with BH1792
+//                   BH1792_NOT_EXIST  => I2C error with BH1792
 //===============================================================================
 //int8_t bh1792_Read(uint8_t adr, uint8_t *data, uint8_t size)
 
@@ -126,8 +126,8 @@ int8_t bh1792_SoftReset(void)
 // @param[inout] : None
 // @retval       : int8_t
 //                   BH1792_SUCCESS       => OK
-//                   BH1792_RC_NO_EXIST => No BH1792 exists
-//                   BH1792_RC_I2C_ERR  => I2C error with BH1792
+//                   BH1792_I2C_ERR => No BH1792 exists
+//                   BH1792_NOT_EXIST  => I2C error with BH1792
 //===============================================================================
 static int8_t bh1792_IsExist(void)
 {
@@ -137,7 +137,7 @@ static int8_t bh1792_IsExist(void)
     ret8 = bh1792_Read(BH1792_PARTID, reg, 1U);
     if (ret8 == BH1792_SUCCESS) {
         if (reg[0] != BH1792_PARTID_VAL) {
-            ret8 = BH1792_RC_NO_EXIST;
+            ret8 = BH1792_I2C_ERR;
         }
     }
     

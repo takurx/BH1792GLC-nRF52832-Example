@@ -55,8 +55,8 @@ void setup() {
   // BH1792
   m_bh1792.fnWrite      = i2c_write;
   m_bh1792.fnRead       = i2c_read;
-  ret = bh1792_Init(&m_bh1792);
-  error_check(ret, "bh1792_Init");
+  ret = bh1792_Reg_Init(&m_bh1792);
+  error_check(ret, "bh1792_Reg_Init");
 
   m_bh1792.prm.sel_adc  = BH1792_PRM_SEL_ADC_GREEN;
   m_bh1792.prm.msr      = BH1792_PRM_MSR_SINGLE;//BH1792_PRM_MSR_1024HZ;

@@ -199,9 +199,9 @@ void twi_init (void)
     // BH1792
     m_bh1792.fnWrite      = i2c_write;
     m_bh1792.fnRead       = i2c_read;
-    ret = bh1792_Init(&m_bh1792);
-    NRF_LOG_INFO("finished bh1792_Init.");
-    //error_check(ret, "bh1792_Init");
+    ret = bh1792_Reg_Init(&m_bh1792);
+    NRF_LOG_INFO("finished bh1792_Reg_Init.");
+    //error_check(ret, "bh1792_Reg_Init");
 
     m_bh1792.prm.sel_adc  = BH1792_PRM_SEL_ADC_GREEN;
     m_bh1792.prm.msr      = BH1792_PRM_MSR_SINGLE;//BH1792_PRM_MSR_1024HZ;
@@ -375,6 +375,36 @@ void error_check(int32_t ret, String msg)
 }
 */
 
+
+int8_t bh1792_Write(uint8_t adr, uint8_t *data, uint8_t size)
+{
+  int8_t rc  = 0;
+  int8_t ret = 0;
+  
+  rc = i2c_write(BH1792_SLAVE_ADDR, adr, data, size);
+  if (rc == 0) {
+    ret = BH1792_SUCCESS;
+  } else {
+    ret = BH1792_NOT_EXIST;
+  }
+
+  return (ret);
+}
+
+int8_t bh1792_Read(uint8_t adr, uint8_t *data, uint8_t size)
+{
+  int8_t rc  = 0;
+  int8_t ret = 0;
+
+  rc = i2c_read(BH1792_SLAVE_ADDR, adr, data, size);
+  if (rc == 0) {
+    ret = BH1792_SUCCESS;
+  } else {
+    ret = BH1792_NOT_EXIST;
+  }
+  
+  return (ret);
+}
 
 void in_pin_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {

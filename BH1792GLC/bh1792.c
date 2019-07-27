@@ -32,6 +32,8 @@ static bh1792_t *s_pBH1792;
 
 
 // Local Function Prototypes
+static int8_t bh1792_IsExist(void);
+
 static int32_t bh1792_getDataOut(bh1792_data_t *dat);
 static int32_t bh1792_getFifoData(bh1792_data_t *dat);
 
@@ -41,7 +43,56 @@ static int32_t bh1792_getFifoData(bh1792_data_t *dat);
 /////////////////////////////////////////////////////////////////////////////////
 
 //===============================================================================
-// @brief  BH1792 Initialization
+// @brief  Initialize BH1792
+// Check if BH1792 is connected, and then do the soft reset.
+//
+// @param[in]    : None
+// @param[out]   : None
+// @param[inout] : None
+// @retval       : int8_t
+//                   BH1792_SUCCESS       => OK
+//                   BH1792_I2C_ERR => No BH1792 exists
+//                   BH1792_NOT_EXIST  => I2C error with BH1792
+//===============================================================================
+int8_t bh1792_Init(void)
+{
+    int8_t  ret8 = BH1792_SUCCESS;
+    
+    ret8 = bh1792_IsExist();
+    if (ret8 == BH1792_SUCCESS) {
+        ret8 = bh1792_SoftReset();
+    }
+    
+    return (ret8);
+}
+
+//===============================================================================
+// @brief  Soft-reset BH1792
+//
+// @param[in]    : None
+// @param[out]   : None
+// @param[inout] : None
+// @retval       : int8_t
+//                   BH1792_SUCCESS       => OK
+//                   BH1792_NOT_EXIST  => I2C error with BH1792
+//===============================================================================
+int8_t bh1792_SoftReset(void)
+{
+    int8_t  ret8 = BH1792_SUCCESS;
+    uint8_t reg[1];
+    
+    reg[0] = BH1792_PRM_SWRESET << 7U;
+    ret8   = bh1792_Write(BH1792_ADDR_RESET, reg, 1U);
+    
+    return (ret8);
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//  Public Functions
+/////////////////////////////////////////////////////////////////////////////////
+
+//===============================================================================
+// @brief  BH1792 Register Initialization
 //
 // @param[in]    : None
 // @param[out]   : None
@@ -50,7 +101,7 @@ static int32_t bh1792_getFifoData(bh1792_data_t *dat);
 //                 BH1792_I2C_ERR
 //                 BH1792_NOT_EXIST
 //===============================================================================
-int32_t bh1792_Init(bh1792_t *pBH1792)
+int32_t bh1792_Reg_Init(bh1792_t *pBH1792)
 {
     int32_t ret     = BH1792_SUCCESS;
     int32_t ret_i2c = 0;
@@ -340,6 +391,32 @@ int32_t bh1792_ClearFifoData(void)
 /////////////////////////////////////////////////////////////////////////////////
 //  Local Functions
 /////////////////////////////////////////////////////////////////////////////////
+
+//===============================================================================
+// @brief  Check if BH1792 is connected using BH1792 PART ID register.
+//
+// @param[in]    : None
+// @param[out]   : None
+// @param[inout] : None
+// @retval       : int8_t
+//                   BH1792_SUCCESS       => OK
+//                   BH1792_I2C_ERR => No BH1792 exists
+//                   BH1792_NOT_EXIST  => I2C error with BH1792
+//===============================================================================
+static int8_t bh1792_IsExist(void)
+{
+    int8_t  ret8 = BH1792_SUCCESS;
+    uint8_t reg[1];
+    
+    ret8 = bh1792_Read(BH1792_ADDR_PARTID, reg, 1U);
+    if (ret8 == BH1792_SUCCESS) {
+        if (reg[0] != BH1792_PRM_MANUFACTURERID) {
+            ret8 = BH1792_I2C_ERR;
+        }
+    }
+    
+    return (ret8);
+}
 
 //===============================================================================
 // @brief  BH1792 IR/GREEN DATA

@@ -70,7 +70,7 @@ uint16_t pw_Init(void)
     uint16_t ret16 = ERROR_NONE;
 
     is_measured  = 0U;
-    //s_pw_rCycle  = BH1792_PRM_CTRL1_RCYCLE_32HZ;
+    //s_pw_rCycle  = BH1792_PRM_MSR_32HZ;
     //s_pw_freq    = BH1792_PRM_CTRL1_FREQ_128HZ;
     //s_pw_cur     = BH1792_PRM_LED_CUR1_MA(0);
     s_pw_mode     = BH1792_PRM_MSR_SINGLE;
@@ -102,9 +102,9 @@ uint16_t pw_StartMeasure(void)
     int8_t     ret8  = BH1792_SUCCESS;
     uint16_t   ret16 = ERROR_NONE;
     uint8_t    reg[7];
-    //MEAS_CTRL1 ctrl1 = { s_pw_rCycle, s_pw_freq, 0, BH1792_PRM_CTRL1_RDY };
+    //MEAS_CTRL1 ctrl1 = { s_pw_rCycle, s_pw_freq, 0, BH1792_PRM_RDY };
     //MEAS_CTRL2 ctrl2 = { s_pw_cur, 0, s_pw_onTime, s_pw_en };
-    MEAS_CTRL1 ctrl1 = { s_pw_mode, 0, BH1792_PRM_CTRL1_SEL_ADC, 0, BH1792_PRM_CTRL1_RDY };
+    MEAS_CTRL1 ctrl1 = { s_pw_mode, 0, BH1792_PRM_SEL_ADC_GREEN, 0, BH1792_PRM_RDY };
     MEAS_CTRL2 ctrl2 = { s_pw_cur1, s_pw_en1 };
     MEAS_CTRL3 ctrl3 = { s_pw_cur2, 0, s_pw_en2 };
     MEAS_CTRL4_LOW ctrl4_low = {0xFC};
@@ -137,7 +137,7 @@ uint16_t pw_StartMeasure(void)
         reg[6] = *(uint8_t *)&start;
 
         // Command Send
-        ret8 = bh1792_Write(BH1792_MEAS_CTRL1, &reg, sizeof(reg));
+        ret8 = bh1792_Write(BH1792_ADDR_MEAS_CTRL1, &reg[0], sizeof(reg));
         if (ret8 == BH1792_SUCCESS) {
             is_measured = 1U;
         }
@@ -229,7 +229,7 @@ uint16_t pw_GetMeasureData(u16_pair_t *data)
         ret16 = ERROR_PW_NOT_MEASURE;
     }
     else {
-        ret8 = bh1792_Read(BH1792_DATAOUT_LEDOFF_LSBS, &reg[0], sizeof(reg));
+        ret8 = bh1792_Read(BH1792_ADDR_GDATA_LEDOFF_LSBS, &reg[0], sizeof(reg));
         if (ret8 == BH1792_SUCCESS){
             data->off    = ((uint16_t)reg[1] << 8) | (uint16_t)reg[0];
             data->on     = ((uint16_t)reg[3] << 8) | (uint16_t)reg[2];
@@ -267,7 +267,7 @@ uint16_t pw_SetParam(uint8_t type, uint8_t value)
     else {
         switch(type) {
             case BH1792_PRM_CTRL1_MSR:
-                if ((value != BH1792_PRM_CTRL1_MSR_NOT_SET_VAL) && (value >= BH1792_PRM_CTRL1_RCYCLE_32HZ && value <= BH1792_PRM_MSR_SINGLE)) 
+                if ((value != BH1792_PRM_MSR_NOT_SET_VAL) && (value >= BH1792_PRM_MSR_32HZ && value <= BH1792_PRM_MSR_SINGLE)) 
                 {
                     ret16 =  ERROR_BH1792_PRM_CTRL1_MSR;
                 }
@@ -276,7 +276,7 @@ uint16_t pw_SetParam(uint8_t type, uint8_t value)
                 }
                 break;
             case BH1792_PRM_CTRL2_EN1:
-                if (value > BH1792_PRM_CTRL2_EN1_LED1_LED2) {
+                if (value > BH1792_PRM_LED_EN1_3) {
                     ret16 =  ERROR_BH1792_PRM_CTRL2_EN1;
                 }
                 else {
@@ -284,7 +284,7 @@ uint16_t pw_SetParam(uint8_t type, uint8_t value)
                 }
                 break;
             case BH1792_PRM_CTRL2_CUR_LED1:
-                if (value > BH1792_PRM_CTRL2_CUR_60MA) {
+                if (value > BH1792_PRM_LED_CUR1_MA(60)) {
                     ret16 =  ERROR_BH1792_PRM_CTRL2_CUR_LED1;
                 }
                 else {
@@ -292,7 +292,7 @@ uint16_t pw_SetParam(uint8_t type, uint8_t value)
                 }
                 break;
             case BH1792_PRM_CTRL3_EN2:
-                if (value > BH1792_PRM_CTRL3_EN2_ON_LED3) {
+                if (value > BH1792_PRM_LED_EN2_1) {
                     ret16 =  ERROR_BH1792_PRM_CTRL3_EN2;
                 }
                 else {
@@ -300,7 +300,7 @@ uint16_t pw_SetParam(uint8_t type, uint8_t value)
                 }
                 break;
             case BH1792_PRM_CTRL3_CUR_LED2:
-                if (value > BH1792_PRM_CTRL2_CUR_60MA) {
+                if (value > BH1792_PRM_LED_CUR1_MA(60)) {
                     ret16 =  ERROR_BH1792_PRM_CTRL3_CUR_LED2;
                 }
                 else {
@@ -374,8 +374,8 @@ static uint16_t errorCode_8toU16(int8_t code)
 
     switch (code) {
         case BH1792_SUCCESS:             ret16 = ERROR_NONE; break;
-        case BH1792_RC_NO_EXIST:       ret16 = ERROR_PW_EXIST_SENSOR; break;
-        case BH1792_RC_I2C_ERR:        ret16 = ERROR_PW_I2C; break;
+        case BH1792_I2C_ERR:       ret16 = ERROR_PW_EXIST_SENSOR; break;
+        case BH1792_NOT_EXIST:        ret16 = ERROR_PW_I2C; break;
         default:                       ret16 = ERROR_PW_UNKNOWN; break;
     }
 

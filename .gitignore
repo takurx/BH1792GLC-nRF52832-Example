@@ -18090,3 +18090,185 @@ modules/nrfx/templates/nRF9160/nrfx_config\.h
 nRF5x_MDK_8_24_1_IAR_NordicLicense\.msi
 
 nRF5x_MDK_8_24_1_Keil4_NordicLicense\.msi
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/Debug/Exe/twi_sensor_pca10040\.elf
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/Debug/Exe/twi_sensor_pca10040\.hex
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/Debug/Exe/twi_sensor_pca10040\.map
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/app_error_handler_gcc\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/app_error_handler_gcc\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/app_error_weak\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/app_error_weak\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/app_error\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/app_error\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/app_timer\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/app_timer\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/app_util_platform\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/app_util_platform\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/bh1792\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/bh1792\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/boards\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/boards\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/main\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/main\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_assert\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_assert\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_atomic\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_atomic\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_balloc\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_balloc\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_drv_clock\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_drv_clock\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_drv_twi\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_drv_twi\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_drv_uart\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_drv_uart\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_fprintf_format\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_fprintf_format\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_fprintf\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_fprintf\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_log_backend_rtt\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_log_backend_rtt\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_log_backend_serial\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_log_backend_serial\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_log_backend_uart\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_log_backend_uart\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_log_default_backends\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_log_default_backends\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_log_frontend\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_log_frontend\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_log_str_formatter\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_log_str_formatter\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_memobj\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_memobj\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_nvic\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_nvic\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_ringbuf\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_ringbuf\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_soc\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_soc\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_strerror\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrf_strerror\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_clock\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_clock\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_gpiote\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_gpiote\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_power_clock\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_power_clock\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_prs\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_prs\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_timer\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_timer\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_twi\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_twi\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_twim\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_twim\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_uart\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_uart\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_uarte\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_uarte\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/SEGGER_RTT_printf\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/SEGGER_RTT_printf\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/SEGGER_RTT_Syscalls_SES\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/SEGGER_RTT_Syscalls_SES\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/SEGGER_RTT\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/SEGGER_RTT\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/ses_startup_nrf_common\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/ses_startup_nrf_common\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/ses_startup_nrf52\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/ses_startup_nrf52\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/system_nrf52\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/system_nrf52\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/thumb_crt0\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/thumb_crt0\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/twi_sensor_pca10040\.ind
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/twi_sensor_pca10040\.ld

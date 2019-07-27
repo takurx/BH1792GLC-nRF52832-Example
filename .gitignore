@@ -18272,3 +18272,57 @@ examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Deb
 examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/twi_sensor_pca10040\.ind
 
 examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/twi_sensor_pca10040\.ld
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/bh1792\.asm
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/heartRate\.asm
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/heartRate\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/heartRate\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/hr_bh1792\.asm
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/hr_bh1792\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/hr_bh1792\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/iirFilter\.asm
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/iirFilter\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/iirFilter\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/lxCtrl\.asm
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/lxCtrl\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/lxCtrl\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/main\.asm
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/movingAverage\.asm
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/movingAverage\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/movingAverage\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_gpiote\.asm
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_twim\.asm
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/nrfx_uarte\.asm
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/pw_bh1792\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/pwCalc\.asm
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/pwCalc\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/pwCalc\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/touchDet\.asm
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/touchDet\.d
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/touchDet\.o

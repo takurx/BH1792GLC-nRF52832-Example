@@ -25,8 +25,8 @@
 #ifndef BH1792_H
 #define BH1792_H
 
-#include <type_def.h>
-
+//#include <type_def.h>
+#include <typeDef.h>
 
 //==============================================================================
 //  Constants
@@ -136,15 +136,27 @@
 #define BH1792_PRM_FIFO_LEV_WTM         (0x20U)  // FIFO Length = 32 (Watermark)
 #define BH1792_PRM_FIFO_LEV_FULL        (0x23U)  // FIFO Length = 35 (Full)
 
+// Paramter Type
+//#define BH1792_PRM_CTRL1_FREQ          (0U)
+//#define BH1792_PRM_CTRL1_RCYCLE        (1U)
+#define BH1792_PRM_CTRL1_MSR           (0U)
+#define BH1792_PRM_CTRL2_EN1           (1U)
+//#define BH1792_PRM_CTRL2_ONTIME        (3U)
+#define BH1792_PRM_CTRL2_CUR_LED1      (2U)
+#define BH1792_PRM_CTRL3_EN2           (3U)
+#define BH1792_PRM_CTRL3_CUR_LED2      (4U)
 
 //===============================================================================
 //  Type Definitions
 //===============================================================================
 // BH1792 Measurment Data
+/*
 typedef struct {
     uint16_t       on;
     uint16_t       off;
 } u16_pair_t;
+*/
+//extern typedef struct u16_pair_t; // pair of 16bit unsigned integer type
 
 typedef struct {
     uint32_t       on;

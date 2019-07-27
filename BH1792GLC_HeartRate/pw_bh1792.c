@@ -66,20 +66,20 @@ static uint16_t errorCode_8toU16(int8_t code);
 //===============================================================================
 uint16_t pw_Init(void)
 {
-    int8_t   ret8  = BH1792_RC_OK;
+    int8_t   ret8  = BH1792_SUCCESS;
     uint16_t ret16 = ERROR_NONE;
 
     is_measured  = 0U;
     //s_pw_rCycle  = BH1792_PRM_CTRL1_RCYCLE_32HZ;
     //s_pw_freq    = BH1792_PRM_CTRL1_FREQ_128HZ;
-    //s_pw_cur     = BH1792_PRM_CTRL2_CUR_0MA;
-    s_pw_mode     = BH1792_PRM_CTRL1_SINGLE_MEASURE;
-    s_pw_cur1     = BH1792_PRM_CTRL2_CUR_0MA;
+    //s_pw_cur     = BH1792_PRM_LED_CUR1_MA(0);
+    s_pw_mode     = BH1792_PRM_MSR_SINGLE;
+    s_pw_cur1     = BH1792_PRM_LED_CUR1_MA(0);
     //s_pw_onTime  = BH1792_PRM_CTRL2_ONTIME_0_3MS;
     //s_pw_en      = BH1792_PRM_CTRL2_EN_NONE;
-    s_pw_en1      = BH1792_PRM_CTRL2_EN1_NONE;
-    s_pw_cur2     = BH1792_PRM_CTRL3_CUR_0MA;
-    s_pw_en2      = BH1792_PRM_CTRL3_EN2_OFF_LED3;
+    s_pw_en1      = BH1792_PRM_LED_EN1_0;
+    s_pw_cur2     = BH1792_PRM_LED_CUR2_MA(0);
+    s_pw_en2      = BH1792_PRM_LED_EN2_0;
 
     ret8  = bh1792_Init();
     ret16 = errorCode_8toU16(ret8);
@@ -99,7 +99,7 @@ uint16_t pw_Init(void)
 //===============================================================================
 uint16_t pw_StartMeasure(void)
 {
-    int8_t     ret8  = BH1792_RC_OK;
+    int8_t     ret8  = BH1792_SUCCESS;
     uint16_t   ret16 = ERROR_NONE;
     uint8_t    reg[7];
     //MEAS_CTRL1 ctrl1 = { s_pw_rCycle, s_pw_freq, 0, BH1792_PRM_CTRL1_RDY };
@@ -114,7 +114,7 @@ uint16_t pw_StartMeasure(void)
     uint8_t    reg1;
     
     ret8 = bh1792_SoftReset();
-    if (ret8 == BH1792_RC_OK) {
+    if (ret8 == BH1792_SUCCESS) {
         // BH1792_MEAS_CTRL1 Config Parameters
         reg[0] = *(uint8_t *)&ctrl1;
         
@@ -138,7 +138,7 @@ uint16_t pw_StartMeasure(void)
 
         // Command Send
         ret8 = bh1792_Write(BH1792_MEAS_CTRL1, &reg, sizeof(reg));
-        if (ret8 == BH1792_RC_OK) {
+        if (ret8 == BH1792_SUCCESS) {
             is_measured = 1U;
         }
     }
@@ -161,7 +161,7 @@ uint16_t pw_StartMeasure(void)
 /*
 uint16_t pw_OneMoreStartMeasure(void)
 {
-    int8_t     ret8  = BH1792_RC_OK;
+    int8_t     ret8  = BH1792_SUCCESS;
     uint16_t   ret16 = ERROR_NONE;
 
     MEAS_START start = { BH1792_PRM_MEAS_ST, 0 };
@@ -172,7 +172,7 @@ uint16_t pw_OneMoreStartMeasure(void)
     
     // Command Send
     ret8 = bh1792_Write(BH1792_MEAS_START, (uint8_t *)reg1, sizeof(reg1));
-    if (ret8 == BH1792_RC_OK) {
+    if (ret8 == BH1792_SUCCESS) {
         is_measured = 1U;
     }
     
@@ -194,11 +194,11 @@ uint16_t pw_OneMoreStartMeasure(void)
 //===============================================================================
 uint16_t pw_StopMeasure(void)
 {
-    int8_t   ret8  = BH1792_RC_OK;
+    int8_t   ret8  = BH1792_SUCCESS;
     uint16_t ret16 = ERROR_NONE;
 
     ret8 = bh1792_SoftReset();
-    if (ret8 == BH1792_RC_OK) {
+    if (ret8 == BH1792_SUCCESS) {
         is_measured = 0U;
     }
 
@@ -221,7 +221,7 @@ uint16_t pw_StopMeasure(void)
 //===============================================================================
 uint16_t pw_GetMeasureData(u16_pair_t *data)
 {
-    int8_t   ret8  = BH1792_RC_OK;
+    int8_t   ret8  = BH1792_SUCCESS;
     uint16_t ret16 = ERROR_NONE;
     uint8_t  reg[5] = {0};
     
@@ -230,7 +230,7 @@ uint16_t pw_GetMeasureData(u16_pair_t *data)
     }
     else {
         ret8 = bh1792_Read(BH1792_DATAOUT_LEDOFF_LSBS, &reg[0], sizeof(reg));
-        if (ret8 == BH1792_RC_OK){
+        if (ret8 == BH1792_SUCCESS){
             data->off    = ((uint16_t)reg[1] << 8) | (uint16_t)reg[0];
             data->on     = ((uint16_t)reg[3] << 8) | (uint16_t)reg[2];
         }
@@ -267,7 +267,7 @@ uint16_t pw_SetParam(uint8_t type, uint8_t value)
     else {
         switch(type) {
             case BH1792_PRM_CTRL1_MSR:
-                if ((value != BH1792_PRM_CTRL1_MSR_NOT_SET_VAL) && (value >= BH1792_PRM_CTRL1_RCYCLE_32HZ && value <= BH1792_PRM_CTRL1_SINGLE_MEASURE)) 
+                if ((value != BH1792_PRM_CTRL1_MSR_NOT_SET_VAL) && (value >= BH1792_PRM_CTRL1_RCYCLE_32HZ && value <= BH1792_PRM_MSR_SINGLE)) 
                 {
                     ret16 =  ERROR_BH1792_PRM_CTRL1_MSR;
                 }
@@ -373,7 +373,7 @@ static uint16_t errorCode_8toU16(int8_t code)
     uint16_t ret16 = ERROR_NONE;
 
     switch (code) {
-        case BH1792_RC_OK:             ret16 = ERROR_NONE; break;
+        case BH1792_SUCCESS:             ret16 = ERROR_NONE; break;
         case BH1792_RC_NO_EXIST:       ret16 = ERROR_PW_EXIST_SENSOR; break;
         case BH1792_RC_I2C_ERR:        ret16 = ERROR_PW_I2C; break;
         default:                       ret16 = ERROR_PW_UNKNOWN; break;

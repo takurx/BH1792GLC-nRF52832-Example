@@ -18326,3 +18326,7 @@ examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Deb
 examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/touchDet\.d
 
 examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/touchDet\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/Output/twi_sensor_pca10040 Debug/Obj/pw_bh1792\.o
+
+examples/peripheral/twi_sensor/pca10040/blank/ses/twi_sensor_pca10040_Debug\.jlink

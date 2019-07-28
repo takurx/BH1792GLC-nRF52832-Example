@@ -96,7 +96,8 @@ uint16_t hr_bh1792_StartMeasure(void)
 {
     uint16_t ret16 = ERROR_NONE;
 
-    ret16 = pw_StartMeasure();
+    //ret16 = pw_StartMeasure();
+    ret16 = bh1792_StartMeasure();
 
     return (ret16);
 }

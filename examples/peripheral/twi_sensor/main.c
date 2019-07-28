@@ -85,6 +85,7 @@
 #include "nrf_drv_twi.h"
 #include "nrf_delay.h"
 #include <bh1792.h>
+#include <hr_bh1792.h>
 
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
@@ -203,6 +204,10 @@ void twi_init (void)
     NRF_LOG_INFO("finished bh1792_Reg_Init.");
     //error_check(ret, "bh1792_Reg_Init");
 
+    ret = hr_bh1792_Init();
+    NRF_LOG_INFO("finished hr_bh1792_Init.");
+    //error_check(ret, "hr_bh1792_Init");
+
     m_bh1792.prm.sel_adc  = BH1792_PRM_SEL_ADC_GREEN;
     m_bh1792.prm.msr      = BH1792_PRM_MSR_SINGLE;//BH1792_PRM_MSR_1024HZ;
     m_bh1792.prm.led_en   = (BH1792_PRM_LED_EN1_0 << 1) | BH1792_PRM_LED_EN2_0;
@@ -217,9 +222,13 @@ void twi_init (void)
 
     //NRF_LOG_INFO("GDATA(@LED_ON),GDATA(@LED_OFF)\n");
 
-    ret = bh1792_StartMeasure();
+    //ret = bh1792_StartMeasure();
     //error_check(ret, "bh1792_StartMeasure");
-    NRF_LOG_INFO("finished bh1792_StartMeasure.");
+    //NRF_LOG_INFO("finished bh1792_StartMeasure.");
+
+    ret = hr_bh1792_StartMeasure();
+    //error_check(ret, "hr_bh1792_StartMeasure");
+    NRF_LOG_INFO("finished Hr_bh1792_StartMeasure.");
 }
 
 
@@ -250,8 +259,12 @@ static void timer_isr(void * p_context)
       }
     } else {
     */
-      ret = bh1792_StartMeasure();
+    
+      //ret = bh1792_StartMeasure();
       //error_check(ret, "bh1792_StartMeasure");
+     
+      ret = hr_bh1792_StartMeasure();
+      //error_check(ret, "hr_bh1792_StartMeasure");
     /*
     }
     */
@@ -260,15 +273,29 @@ static void timer_isr(void * p_context)
 }
 
 
+
+static uint8_t    s_cnt_freq = 0;
+
 void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
     int32_t ret = 0;
     //uint8_t i   = 0;
+    u16_pair_t s_pwData_test;
+    float32_t pw_test;
 
     nrf_drv_gpiote_in_event_disable(ARDUINO_10_PIN);
 
     ret = bh1792_GetMeasData(&m_bh1792_dat);
     //error_check(ret, "bh1792_GetMeasData");
+    //ret = hr_bh1792_Calc(s_cnt_freq);
+    ret = hr_bh1792_Calc(s_cnt_freq, &s_pwData_test, &pw_test);
+    s_cnt_freq++;
+    if (s_cnt_freq >= 25)
+    {
+        s_cnt_freq = 0;
+    }
+    //ret = hr_bh1792_Calc(s_cnt_freq, &s_pwData_test, &pw_test);
+    //error_check(ret, "hr_bh1792_Calc");
 
     // became else root, m_bh1792.prm.msr = BH1792_PRM_MSR_SINGLE
     /*

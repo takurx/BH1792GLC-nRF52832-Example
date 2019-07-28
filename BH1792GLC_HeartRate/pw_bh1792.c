@@ -27,7 +27,6 @@
 #include <bh1792.h>
 #include <pw_bh1792.h>
 
-
 //  Global Variables
 
 
@@ -70,6 +69,8 @@ uint16_t pw_Init(void)
     uint16_t ret16 = ERROR_NONE;
 
     is_measured  = 0U;
+
+    /*
     //s_pw_rCycle  = BH1792_PRM_MSR_32HZ;
     //s_pw_freq    = BH1792_PRM_CTRL1_FREQ_128HZ;
     //s_pw_cur     = BH1792_PRM_LED_CUR1_MA(0);
@@ -82,6 +83,7 @@ uint16_t pw_Init(void)
     s_pw_en2      = BH1792_PRM_LED_EN2_0;
 
     ret8  = bh1792_Init();
+    */
     ret16 = errorCode_8toU16(ret8);
     
     return (ret16);

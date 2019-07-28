@@ -26,6 +26,10 @@
 #include <hr_bh1792.h>
 //#include <typeDef.h>
 
+#include "nrf_log.h"
+#include "nrf_log_ctrl.h"
+#include "nrf_log_default_backends.h"
+
 //  Global Variables
 
 
@@ -75,8 +79,24 @@ uint16_t hr_bh1792_Init(void)
             ret16 = pwCalc_Init();
             if (ret16 == ERROR_NONE) {
                 ret16 = hr_Init(&s_hrPrm);
+                if (ret16 != ERROR_NONE)
+                {
+                    NRF_LOG_INFO("hr_Init error");
+                }
+            }
+            else
+            {
+                NRF_LOG_INFO("pwCalc_Init error");
             }
         }
+        else
+        {
+            NRF_LOG_INFO("lxCtrl_Init error");
+        }
+    }
+    else
+    {
+        NRF_LOG_INFO("pw_Init error");
     }
 
     return (ret16);
@@ -144,7 +164,8 @@ uint16_t hr_bh1792_OneMoreStartMeasure(void)
 //static float32_t s_pw;
 //uint16_t hr_bh1792_Calc(uint8_t cnt_freq)
 //uint16_t hr_bh1792_Calc(uint8_t cnt_freq, u16_pair_t *s_pwData_test, uint8_t *s_is_wearing_test, uint8_t *is_updated_led_test, float32_t *pw_test)
-uint16_t hr_bh1792_Calc(uint8_t cnt_freq, u16_pair_t *data, float32_t *pw_test)
+//uint16_t hr_bh1792_Calc(uint8_t cnt_freq, u16_pair_t *data, float32_t *pw_test)
+uint16_t hr_bh1792_Calc(uint8_t cnt_freq, bh1792_data_t *bh1792_dat, u16_pair_t *data, float32_t *pw_test)
 {
 	uint8_t   meas_hr        = 0U;
     uint8_t   is_updated_led = 0U;
@@ -168,9 +189,14 @@ uint16_t hr_bh1792_Calc(uint8_t cnt_freq, u16_pair_t *data, float32_t *pw_test)
     meas_hr = 1U;
 
     if (meas_hr == 1U) {
-        ret16 = pw_GetMeasureData(&s_pwData);
-        data->on = s_pwData.on;
-        data->off = s_pwData.off;
+        //ret16 = pw_GetMeasureData(&s_pwData);
+        //data->on = s_pwData.on;
+        //data->off = s_pwData.off;
+        data->on = bh1792_dat->green.on;
+        data->off = bh1792_dat->green.off;
+        //s_pwData = bh1792_dat->green;
+        s_pwData.on = bh1792_dat->green.on;
+        s_pwData.off = bh1792_dat->green.off;
         if (ret16 == ERROR_NONE) {
             pwCalc(&s_pwData, &pw);
             
@@ -208,6 +234,8 @@ uint16_t hr_bh1792_Calc(uint8_t cnt_freq, u16_pair_t *data, float32_t *pw_test)
         }
         
     }
+    //*pw_test = 5.555;
+    *pw_test = (float32_t)(s_pwData.on);
 
     return (ret16);
 }

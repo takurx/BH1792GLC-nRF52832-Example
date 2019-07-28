@@ -282,17 +282,24 @@ void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
     //uint8_t i   = 0;
     u16_pair_t s_pwData_test;
     float32_t pw_test;
+    static uint8_t  bpm     = 0U;
+    static uint8_t  wearing = 0U;
 
     nrf_drv_gpiote_in_event_disable(ARDUINO_10_PIN);
 
     ret = bh1792_GetMeasData(&m_bh1792_dat);
     //error_check(ret, "bh1792_GetMeasData");
     //ret = hr_bh1792_Calc(s_cnt_freq);
-    ret = hr_bh1792_Calc(s_cnt_freq, &s_pwData_test, &pw_test);
+    s_pwData_test = m_bh1792_dat.green;
+    ret = hr_bh1792_Calc(s_cnt_freq, &m_bh1792_dat, &s_pwData_test, &pw_test);
     s_cnt_freq++;
     if (s_cnt_freq >= 25)
     {
         s_cnt_freq = 0;
+        hr_bh1792_GetData(&bpm, &wearing);
+        //NRF_LOG_RAW_INFO("%d, %d\n", bpm, wearing);
+        NRF_LOG_RAW_INFO("%d, %d, %d, %d, ", bpm, wearing, s_pwData_test.on, s_pwData_test.off);
+        NRF_LOG_RAW_INFO("" NRF_LOG_FLOAT_MARKER "\n", NRF_LOG_FLOAT(pw_test));
     }
     //ret = hr_bh1792_Calc(s_cnt_freq, &s_pwData_test, &pw_test);
     //error_check(ret, "hr_bh1792_Calc");
@@ -309,7 +316,7 @@ void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
       if(m_bh1792.prm.sel_adc == BH1792_PRM_SEL_ADC_GREEN) {
         */
         //NRF_LOG_RAW_INFO("%d,%d,%d,%d\n", m_bh1792_dat.green.on, m_bh1792_dat.green.off, m_bh1792_dat.ir.on, m_bh1792_dat.ir.off)
-        NRF_LOG_RAW_INFO("%d,%d\n", m_bh1792_dat.green.on, m_bh1792_dat.green.off)
+        //NRF_LOG_RAW_INFO("%d,%d\n", m_bh1792_dat.green.on, m_bh1792_dat.green.off)
         /*
       } else {
         NRF_LOG_RAW_INFO("%d,%d\n", m_bh1792_dat.ir.on, m_bh1792_dat.ir.off)

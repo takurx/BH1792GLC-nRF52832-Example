@@ -59,7 +59,8 @@ uint16_t hr_bh1792_StartMeasure(void);
 uint16_t hr_bh1792_GetMeasureData(u16_pair_t *s_pwData);
 //uint16_t hr_bh1792_Calc(uint8_t cnt_freq);
 //uint16_t hr_bh1792_Calc(uint8_t cnt_freq, u16_pair_t *s_pwData_test, uint8_t *s_is_wearing_test, uint8_t *is_updated_led_test, float32_t *pw_test);
-uint16_t hr_bh1792_Calc(uint8_t cnt_freq, u16_pair_t *s_pwData_test, float32_t *pw_test);
+//uint16_t hr_bh1792_Calc(uint8_t cnt_freq, u16_pair_t *s_pwData_test, float32_t *pw_test);
+uint16_t hr_bh1792_Calc(uint8_t cnt_freq, bh1792_data_t *bh1792_dat, u16_pair_t *s_pwData_test, float32_t *pw_test);
 void     hr_bh1792_GetData(uint8_t *bpm, uint8_t *wearing);
 
 

@@ -27,6 +27,9 @@
 #include <movingAverage.h>
 #include <pwCalc.h>
 
+#include "nrf_log.h"
+#include "nrf_log_ctrl.h"
+#include "nrf_log_default_backends.h"
 
 //  Global Variables
 
@@ -119,10 +122,21 @@ void pwCalc(u16_pair_t *pwData, float32_t *dataOut)
     float32_t dataIn_ave = 0.0F;
     float32_t hpfOut     = 0.0F;
     
-    pre1Out    = ma_AverageF((float32_t)(pwData->on), &s_maPrm_pre1);
+    float32_t pre0Out = (float32_t)(pwData->on);
+    pre1Out    = ma_AverageF(pre0Out, &s_maPrm_pre1);
+    //pre1Out    = ma_AverageF((float32_t)(pwData->on), &s_maPrm_pre1);
     pre2Out    = ma_AverageF(pre1Out,                 &s_maPrm_pre2);
     dataIn_ave = ma_AverageF(pre2Out,                 &s_maPrm_pre3);
     
+    NRF_LOG_RAW_INFO("" NRF_LOG_FLOAT_MARKER ", ", NRF_LOG_FLOAT(pre0Out));
+    NRF_LOG_RAW_INFO("" NRF_LOG_FLOAT_MARKER ", ", NRF_LOG_FLOAT(pre1Out));
+    NRF_LOG_RAW_INFO("" NRF_LOG_FLOAT_MARKER ", ", NRF_LOG_FLOAT(pre2Out));
+    NRF_LOG_RAW_INFO("" NRF_LOG_FLOAT_MARKER "\n", NRF_LOG_FLOAT(dataIn_ave));
+
+    NRF_LOG_RAW_INFO("" NRF_LOG_FLOAT_MARKER ", ", NRF_LOG_FLOAT(s_maPrm_pre1.buffer[0]));
+    NRF_LOG_RAW_INFO("" NRF_LOG_FLOAT_MARKER ", ", NRF_LOG_FLOAT(s_maPrm_pre1.sum));
+    NRF_LOG_RAW_INFO("%d, %d, %d\n", s_maPrm_pre1.pos, s_maPrm_pre1.len, s_maPrm_pre1.num);
+
     if (s_is_init == 0U) {
         s_is_init = 1U;
         iir_Set(dataIn_ave, dataIn_ave, &s_iirPrm_hpf);

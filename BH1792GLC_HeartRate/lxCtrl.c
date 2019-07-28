@@ -33,9 +33,15 @@
 
 
 //  Static Variables
+//static const uint8_t led_config_w1[] = {
+//    BH1790_PRM_CTRL2_ONTIME_0_3MS, BH1790_PRM_CTRL2_CUR_0MA
+//};
+//static const uint8_t led_config_w1[] = {
+//    ((BH1792_PRM_RDY << 7) | (BH1792_PRM_SEL_ADC_GREEN << 4) | BH1792_PRM_MSR_SINGLE), 
+//    ((BH1792_PRM_LED_EN1_0 << 6) | BH1792_PRM_LED_CUR1_MA(0))
+//};
 static const uint8_t led_config_w1[] = {
-    ((BH1792_PRM_RDY << 7) | (BH1792_PRM_SEL_ADC_GREEN << 4) | BH1792_PRM_MSR_SINGLE), 
-    ((BH1792_PRM_LED_EN1_0 << 6) | BH1792_PRM_LED_CUR1_MA(0))
+      BH1792_PRM_LED_CUR1_MA(3), BH1792_PRM_LED_CUR2_MA(0)
 };
 
 static int32_t    s_led_lv;
@@ -69,9 +75,9 @@ uint16_t lxCtrl_Init(void)
     s_th_up      = LX_TH_UP_INIT;
     s_cnt_lv_sel = 0U;
     
-    ret16 = pw_SetParam(BH1792_ADDR_MEAS_CTRL1, led_config_w1[0]);
+    ret16 = pw_SetParam(BH1792_PRM_CTRL2_CUR_LED1, BH1792_PRM_LED_CUR1_MA(3));
     if (ret16 == ERROR_NONE) {
-        ret16 = pw_SetParam(BH1792_ADDR_MEAS_CTRL2, led_config_w1[1]);
+        ret16 = pw_SetParam(BH1792_PRM_CTRL3_CUR_LED2, BH1792_PRM_LED_CUR2_MA(0));
     }
     
     return (ret16);

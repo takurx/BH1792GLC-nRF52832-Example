@@ -25,6 +25,9 @@
 #include <math.h>
 #include <iirFilter.h>
 
+#include "nrf_log.h"
+#include "nrf_log_ctrl.h"
+#include "nrf_log_default_backends.h"
 
 //  Global Variables
 
@@ -85,10 +88,19 @@ float32_t iir_Filter(float32_t data, iirParam *prm)
     float32_t work2 = 0.0F;
     float32_t work  = 0.0F;
     
+    float32_t work0 = 0.0F;
+    work0 = prm->coeff.a0 * data;
+
     work1 = (prm->coeff.a0 * data) + (prm->coeff.a1 * prm->reg.x1) + (prm->coeff.a2 * prm->reg.x2);
     work2 = (prm->coeff.b1 * prm->reg.y1) + (prm->coeff.b2 * prm->reg.y2);
     work  = work1 + work2;
     
+    //NRF_LOG_RAW_INFO("" NRF_LOG_FLOAT_MARKER ", ", NRF_LOG_FLOAT(data));
+    //NRF_LOG_RAW_INFO("" NRF_LOG_FLOAT_MARKER ", ", NRF_LOG_FLOAT(work0));
+    //NRF_LOG_RAW_INFO("" NRF_LOG_FLOAT_MARKER ", ", NRF_LOG_FLOAT(work1));
+    //NRF_LOG_RAW_INFO("" NRF_LOG_FLOAT_MARKER ", ", NRF_LOG_FLOAT(work2));
+    //NRF_LOG_RAW_INFO("" NRF_LOG_FLOAT_MARKER "\n", NRF_LOG_FLOAT(work));
+
     prm->reg.x2 = prm->reg.x1;
     prm->reg.x1 = data;
     

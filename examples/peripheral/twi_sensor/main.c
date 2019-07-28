@@ -113,7 +113,8 @@
 
 APP_TIMER_DEF(m_bh1792glc_timer_id);
 //#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(1000)   //1 Hz Timer
-#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(25)       //40 Hz Timer
+//#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(25)       //40 Hz Timer
+#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(31)       //32.258 Hz Timer
 
 /* Indicates if operation on TWI has ended (when received). */
 static volatile bool m_xfer_done = false;
@@ -293,14 +294,15 @@ void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
     s_pwData_test = m_bh1792_dat.green;
     ret = hr_bh1792_Calc(s_cnt_freq, &m_bh1792_dat, &s_pwData_test, &pw_test);
     s_cnt_freq++;
-    if (s_cnt_freq >= 25)
+    if (s_cnt_freq >= 31)
     {
         s_cnt_freq = 0;
         hr_bh1792_GetData(&bpm, &wearing);
         //NRF_LOG_RAW_INFO("%d, %d\n", bpm, wearing);
-        NRF_LOG_RAW_INFO("%d, %d, %d, %d, ", bpm, wearing, s_pwData_test.on, s_pwData_test.off);
-        NRF_LOG_RAW_INFO("" NRF_LOG_FLOAT_MARKER "\n", NRF_LOG_FLOAT(pw_test));
     }
+    NRF_LOG_RAW_INFO("%d, %d, %d, %d, ", bpm, wearing, s_pwData_test.on, s_pwData_test.off);
+    NRF_LOG_RAW_INFO("" NRF_LOG_FLOAT_MARKER "\n", NRF_LOG_FLOAT(pw_test));
+    
     //ret = hr_bh1792_Calc(s_cnt_freq, &s_pwData_test, &pw_test);
     //error_check(ret, "hr_bh1792_Calc");
 

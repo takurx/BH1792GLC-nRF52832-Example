@@ -167,7 +167,7 @@ uint16_t hr_bh1792_OneMoreStartMeasure(void)
 //uint16_t hr_bh1792_Calc(uint8_t cnt_freq, u16_pair_t *data, float32_t *pw_test)
 uint16_t hr_bh1792_Calc(uint8_t cnt_freq, bh1792_data_t *bh1792_dat, u16_pair_t *data, float32_t *pw_test)
 {
-	uint8_t   meas_hr        = 0U;
+    uint8_t   meas_hr        = 0U;
     uint8_t   is_updated_led = 0U;
     uint16_t  ret16          = ERROR_NONE;
     float32_t pw             = 0.0F;
@@ -235,7 +235,7 @@ uint16_t hr_bh1792_Calc(uint8_t cnt_freq, bh1792_data_t *bh1792_dat, u16_pair_t 
         
     }
     //*pw_test = 5.555;
-    *pw_test = (float32_t)(s_pwData.on);
+    //*pw_test = (float32_t)(s_pwData.on);
 
     return (ret16);
 }

@@ -156,6 +156,7 @@ uint16_t lxCtrl(const u16_pair_t *data, TD_STATE td_stat, uint8_t *is_updated_le
             break;
     }
     
+    #if 0
     if (*is_updated_led == 1U) {
         ret16 = pw_StopMeasure();
         /*
@@ -166,11 +167,14 @@ uint16_t lxCtrl(const u16_pair_t *data, TD_STATE td_stat, uint8_t *is_updated_le
         if (ret16 == ERROR_NONE) {
             ret16 = pw_SetParam(BH1792_PRM_CTRL2_CUR_LED1, led_mA);
         }
+        /*
         if (ret16 == ERROR_NONE) {
             ret16 = pw_StartMeasure();
         }
+        */
     }
-    
+    #endif
+
     s_pre_stat = td_stat;
     
     return (ret16);

@@ -1,5 +1,12 @@
 # BH1792GLC-nRF52832-Example
 
+## Problem, to do
+- need to refatoring (delete commented code, needless code/function)
+- intterrupt 32.258 Hz, more approch to 32.0 Hz (need to control micro second)
+- Or optimize iir filter const in pwCalc_Init()
+- more control precisely intensity of LED (currently optimized BH1970GLC, BH1792GLC can control precisely)
+- need to control IR (turn on when in darkness, regardless with/without finger)
+
 ## BH1792GLC
 https://www.rohm.co.jp/sensor-shield-support/pulse-wave-sensor2
 

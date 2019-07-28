@@ -85,6 +85,7 @@
 #include "nrf_drv_twi.h"
 #include "nrf_delay.h"
 #include <bh1792.h>
+#include <hr_bh1792.h>
 
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
@@ -112,7 +113,8 @@
 
 APP_TIMER_DEF(m_bh1792glc_timer_id);
 //#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(1000)   //1 Hz Timer
-#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(25)       //40 Hz Timer
+//#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(25)       //40 Hz Timer
+#define BH1792GLC_MEAS_INTERVAL         APP_TIMER_TICKS(31)       //32.258 Hz Timer
 
 /* Indicates if operation on TWI has ended (when received). */
 static volatile bool m_xfer_done = false;
@@ -199,9 +201,13 @@ void twi_init (void)
     // BH1792
     m_bh1792.fnWrite      = i2c_write;
     m_bh1792.fnRead       = i2c_read;
-    ret = bh1792_Init(&m_bh1792);
-    NRF_LOG_INFO("finished bh1792_Init.");
-    //error_check(ret, "bh1792_Init");
+    ret = bh1792_Reg_Init(&m_bh1792);
+    NRF_LOG_INFO("finished bh1792_Reg_Init.");
+    //error_check(ret, "bh1792_Reg_Init");
+
+    ret = hr_bh1792_Init();
+    NRF_LOG_INFO("finished hr_bh1792_Init.");
+    //error_check(ret, "hr_bh1792_Init");
 
     m_bh1792.prm.sel_adc  = BH1792_PRM_SEL_ADC_GREEN;
     m_bh1792.prm.msr      = BH1792_PRM_MSR_SINGLE;//BH1792_PRM_MSR_1024HZ;
@@ -217,9 +223,13 @@ void twi_init (void)
 
     //NRF_LOG_INFO("GDATA(@LED_ON),GDATA(@LED_OFF)\n");
 
-    ret = bh1792_StartMeasure();
+    //ret = bh1792_StartMeasure();
     //error_check(ret, "bh1792_StartMeasure");
-    NRF_LOG_INFO("finished bh1792_StartMeasure.");
+    //NRF_LOG_INFO("finished bh1792_StartMeasure.");
+
+    ret = hr_bh1792_StartMeasure();
+    //error_check(ret, "hr_bh1792_StartMeasure");
+    NRF_LOG_INFO("finished Hr_bh1792_StartMeasure.");
 }
 
 
@@ -250,8 +260,16 @@ static void timer_isr(void * p_context)
       }
     } else {
     */
-      ret = bh1792_StartMeasure();
+    
+      //m_bh1792.prm.led_cur1 = BH1792_PRM_LED_CUR1_MA(0);
+      //m_bh1792.prm.led_cur2 = BH1792_PRM_LED_CUR2_MA(0);
+      pw_GetParam(BH1792_PRM_CTRL2_CUR_LED1, &(m_bh1792.prm.led_cur1));
+      pw_GetParam(BH1792_PRM_CTRL3_CUR_LED2, &(m_bh1792.prm.led_cur2));
+      ret = bh1792_SetParams();
+      //ret = bh1792_StartMeasure();
       //error_check(ret, "bh1792_StartMeasure");
+      ret = hr_bh1792_StartMeasure();
+      //error_check(ret, "hr_bh1792_StartMeasure");
     /*
     }
     */
@@ -260,15 +278,37 @@ static void timer_isr(void * p_context)
 }
 
 
+
+static uint8_t    s_cnt_freq = 0;
+
 void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
     int32_t ret = 0;
     //uint8_t i   = 0;
+    u16_pair_t s_pwData_test;
+    float32_t pw_test;
+    static uint8_t  bpm     = 0U;
+    static uint8_t  wearing = 0U;
 
     nrf_drv_gpiote_in_event_disable(ARDUINO_10_PIN);
 
-    ret = bh1792_GetMeasData(&m_bh1792_dat);
+    //ret = bh1792_GetMeasData(&m_bh1792_dat);
     //error_check(ret, "bh1792_GetMeasData");
+    //ret = hr_bh1792_Calc(s_cnt_freq);
+    //s_pwData_test = m_bh1792_dat.green;
+    ret = hr_bh1792_Calc(s_cnt_freq, &m_bh1792_dat, &s_pwData_test, &pw_test);
+    s_cnt_freq++;
+    if (s_cnt_freq >= 31)
+    {
+        s_cnt_freq = 0;
+        hr_bh1792_GetData(&bpm, &wearing);
+        //NRF_LOG_RAW_INFO("%d, %d\n", bpm, wearing);
+    }
+    NRF_LOG_RAW_INFO("%d, %d, %d, %d, ", bpm, wearing, s_pwData_test.on, s_pwData_test.off);
+    NRF_LOG_RAW_INFO("" NRF_LOG_FLOAT_MARKER "\n", NRF_LOG_FLOAT(pw_test));
+    
+    //ret = hr_bh1792_Calc(s_cnt_freq, &s_pwData_test, &pw_test);
+    //error_check(ret, "hr_bh1792_Calc");
 
     // became else root, m_bh1792.prm.msr = BH1792_PRM_MSR_SINGLE
     /*
@@ -282,7 +322,7 @@ void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
       if(m_bh1792.prm.sel_adc == BH1792_PRM_SEL_ADC_GREEN) {
         */
         //NRF_LOG_RAW_INFO("%d,%d,%d,%d\n", m_bh1792_dat.green.on, m_bh1792_dat.green.off, m_bh1792_dat.ir.on, m_bh1792_dat.ir.off)
-        NRF_LOG_RAW_INFO("%d,%d\n", m_bh1792_dat.green.on, m_bh1792_dat.green.off)
+        //NRF_LOG_RAW_INFO("%d,%d\n", m_bh1792_dat.green.on, m_bh1792_dat.green.off)
         /*
       } else {
         NRF_LOG_RAW_INFO("%d,%d\n", m_bh1792_dat.ir.on, m_bh1792_dat.ir.off)
@@ -375,6 +415,36 @@ void error_check(int32_t ret, String msg)
 }
 */
 
+
+int8_t bh1792_Write(uint8_t adr, uint8_t *data, uint8_t size)
+{
+  int8_t rc  = 0;
+  int8_t ret = 0;
+  
+  rc = i2c_write(BH1792_SLAVE_ADDR, adr, data, size);
+  if (rc == 0) {
+    ret = BH1792_SUCCESS;
+  } else {
+    ret = BH1792_NOT_EXIST;
+  }
+
+  return (ret);
+}
+
+int8_t bh1792_Read(uint8_t adr, uint8_t *data, uint8_t size)
+{
+  int8_t rc  = 0;
+  int8_t ret = 0;
+
+  rc = i2c_read(BH1792_SLAVE_ADDR, adr, data, size);
+  if (rc == 0) {
+    ret = BH1792_SUCCESS;
+  } else {
+    ret = BH1792_NOT_EXIST;
+  }
+  
+  return (ret);
+}
 
 void in_pin_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {

@@ -25,8 +25,8 @@
 #ifndef BH1792_H
 #define BH1792_H
 
-#include <type_def.h>
-
+//#include <type_def.h>
+#include <typeDef.h>
 
 //==============================================================================
 //  Constants
@@ -91,6 +91,7 @@
 #define BH1792_PRM_MSR_128HZ            (0x01U)  // LED_Freq= 128Hz, OUTPUT_Freq= 128Hz, FIFO=Stored
 #define BH1792_PRM_MSR_64HZ             (0x02U)  // LED_Freq= 256Hz, OUTPUT_Freq=  64Hz, FIFO=Stored
 #define BH1792_PRM_MSR_256HZ            (0x03U)  // LED_Freq= 256Hz, OUTPUT_Freq= 256Hz, FIFO=Stored
+#define BH1792_PRM_MSR_NOT_SET_VAL      (0x04U)
 #define BH1792_PRM_MSR_1024HZ           (0x05U)  // LED_Freq=1024Hz, OUTPUT_Freq=1024Hz, FIFO=Stored
 #define BH1792_PRM_MSR_NON_SYNC         (0x06U)  // LED_Freq=   4Hz, OUTPUT_Freq=   4Hz, FIFO=Not Stored
 #define BH1792_PRM_MSR_SINGLE           (0x07U)  // LED_Freq=   -Hz, OUTPUT_Freq=   -Hz, FIFO=Not Stored
@@ -136,15 +137,27 @@
 #define BH1792_PRM_FIFO_LEV_WTM         (0x20U)  // FIFO Length = 32 (Watermark)
 #define BH1792_PRM_FIFO_LEV_FULL        (0x23U)  // FIFO Length = 35 (Full)
 
+// Paramter Type
+//#define BH1792_PRM_CTRL1_FREQ          (0U)
+//#define BH1792_PRM_CTRL1_RCYCLE        (1U)
+#define BH1792_PRM_CTRL1_MSR           (0U)
+#define BH1792_PRM_CTRL2_EN1           (1U)
+//#define BH1792_PRM_CTRL2_ONTIME        (3U)
+#define BH1792_PRM_CTRL2_CUR_LED1      (2U)
+#define BH1792_PRM_CTRL3_EN2           (3U)
+#define BH1792_PRM_CTRL3_CUR_LED2      (4U)
 
 //===============================================================================
 //  Type Definitions
 //===============================================================================
 // BH1792 Measurment Data
+/*
 typedef struct {
     uint16_t       on;
     uint16_t       off;
 } u16_pair_t;
+*/
+//extern typedef struct u16_pair_t; // pair of 16bit unsigned integer type
 
 typedef struct {
     uint32_t       on;
@@ -207,11 +220,17 @@ typedef struct {
 //===============================================================================
 //  Public Function Prototypes
 //===============================================================================
+int8_t bh1792_Init(void);
+int8_t bh1792_SoftReset(void);
+// Please implement the I2C I/F in the following functions
+int8_t bh1792_Write(uint8_t adr, uint8_t *data, uint8_t size);
+int8_t bh1792_Read (uint8_t adr, uint8_t *data, uint8_t size);
+
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
-extern int32_t bh1792_Init(bh1792_t *pBH1792);
+extern int32_t bh1792_Reg_Init(bh1792_t *pBH1792);
 extern int32_t bh1792_SetParams(void);
 extern int32_t bh1792_StartMeasure(void);
 extern int32_t bh1792_StopMeasure(void);

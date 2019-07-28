@@ -189,6 +189,7 @@ uint16_t hr_bh1792_Calc(uint8_t cnt_freq, bh1792_data_t *bh1792_dat, u16_pair_t 
     meas_hr = 1U;
 
     if (meas_hr == 1U) {
+        ret16 = bh1792_GetMeasData(bh1792_dat);
         //ret16 = pw_GetMeasureData(&s_pwData);
         //data->on = s_pwData.on;
         //data->off = s_pwData.off;

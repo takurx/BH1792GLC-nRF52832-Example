@@ -288,10 +288,10 @@ void bh1792_isr(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 
     nrf_drv_gpiote_in_event_disable(ARDUINO_10_PIN);
 
-    ret = bh1792_GetMeasData(&m_bh1792_dat);
+    //ret = bh1792_GetMeasData(&m_bh1792_dat);
     //error_check(ret, "bh1792_GetMeasData");
     //ret = hr_bh1792_Calc(s_cnt_freq);
-    s_pwData_test = m_bh1792_dat.green;
+    //s_pwData_test = m_bh1792_dat.green;
     ret = hr_bh1792_Calc(s_cnt_freq, &m_bh1792_dat, &s_pwData_test, &pw_test);
     s_cnt_freq++;
     if (s_cnt_freq >= 31)

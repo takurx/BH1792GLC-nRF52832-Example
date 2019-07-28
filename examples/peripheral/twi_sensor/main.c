@@ -261,9 +261,13 @@ static void timer_isr(void * p_context)
     } else {
     */
     
+      //m_bh1792.prm.led_cur1 = BH1792_PRM_LED_CUR1_MA(0);
+      //m_bh1792.prm.led_cur2 = BH1792_PRM_LED_CUR2_MA(0);
+      pw_GetParam(BH1792_PRM_CTRL2_CUR_LED1, &(m_bh1792.prm.led_cur1));
+      pw_GetParam(BH1792_PRM_CTRL3_CUR_LED2, &(m_bh1792.prm.led_cur2));
+      ret = bh1792_SetParams();
       //ret = bh1792_StartMeasure();
       //error_check(ret, "bh1792_StartMeasure");
-     
       ret = hr_bh1792_StartMeasure();
       //error_check(ret, "hr_bh1792_StartMeasure");
     /*

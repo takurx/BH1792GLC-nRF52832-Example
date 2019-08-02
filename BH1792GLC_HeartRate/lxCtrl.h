@@ -2,6 +2,7 @@
 // lxCtrl.h
 // 
 // Copyright (c) 2016 ROHM Co.,Ltd.
+// Copyright (C) 2019 HERBIO Co., Ltd.
 // Copyright (c) 2019 Yoshihiro Nakagawa a.k.a. takurx, JJT1BC
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy

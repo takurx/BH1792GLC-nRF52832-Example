@@ -212,7 +212,7 @@ void twi_init (void)
     m_bh1792.prm.sel_adc  = BH1792_PRM_SEL_ADC_GREEN;
     m_bh1792.prm.msr      = BH1792_PRM_MSR_SINGLE;//BH1792_PRM_MSR_1024HZ;
     m_bh1792.prm.led_en   = (BH1792_PRM_LED_EN1_0 << 1) | BH1792_PRM_LED_EN2_0;
-    m_bh1792.prm.led_cur1 = BH1792_PRM_LED_CUR1_MA(1);
+    m_bh1792.prm.led_cur1 = BH1792_PRM_LED_CUR1_MA(0);
     m_bh1792.prm.led_cur2 = BH1792_PRM_LED_CUR2_MA(0);
     m_bh1792.prm.ir_th    = 0xFFFC;
     m_bh1792.prm.int_sel  = BH1792_PRM_INT_SEL_SGL;//BH1792_PRM_INT_SEL_WTM;
